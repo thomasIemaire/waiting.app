@@ -7,7 +7,7 @@
                 placeholder="Rechercher sur les champs" [showHeader]="false" (ngModelChange)="onSearchChange()"
                 selectedItemsLabel="{0} champs sélectionnés" />
         </div>
-        <p-table [value]="searchData" size="small" paginator="true" [rows]="20"
+        <p-table [value]="searchData" paginator="true" [rows]="20"
             selectionMode="single" (selectionChange)="onSelectionChange($event)"
             responsiveLayout="scroll">
             <ng-template #caption>

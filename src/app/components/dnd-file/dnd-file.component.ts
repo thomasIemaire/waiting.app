@@ -164,7 +164,7 @@ export class DndFileComponent {
         this.messageService.add({
             severity: refused.length ? 'warn' : 'info',
             summary: refused.length ? 'Certains fichiers ont été refusés' : 'Fichiers acceptés',
-            detail: refused.length ? refused.map(f => f.name).join(', ') : undefined,
+            detail: refused.length ? refused.map(f => f.name).join(', ') : accepted.map(f => f.name).join(', '),
             life: 3000
         });
 

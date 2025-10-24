@@ -41,6 +41,13 @@
                 object-fit: cover;
                 border-radius: var(--radius-m);
                 border: 2px solid var(--background-color-400);
+                cursor: pointer;
+
+                transition: .2s filter ease-in;
+                
+                &:hover {
+                    filter: contrast(.85);
+                }
             }
         }
 
