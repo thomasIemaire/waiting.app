@@ -1,0 +1,25 @@
+.documents__wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--gap-xl) / 2);
+
+    app-dnd-file {
+        width: 100%;
+        height: 128px;
+        min-height: 128px;
+        max-height: 128px;
+    }
+}
+
+::ng-deep {
+    .documents__wrapper {
+        >*:not(app-dnd-file, router-outlet) {
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+            flex: 1;
+        }
+    }
+}

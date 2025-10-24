@@ -1,0 +1,78 @@
+.preview-document__wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+
+    .preview-document__header,
+    .preview-document__footer {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .preview-document__header-alert {
+            display: flex;
+            align-items: center;
+            gap: var(--gap-s);
+            color: var(--p-orange-500);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+    }
+
+    .preview-document__content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        min-height: 0;
+        gap: var(--gap-xl);
+
+        .preview-document__image {
+            height: 100%;
+            background-color: var(--background-color-100);
+            border-radius: var(--radius-l);
+            padding: var(--padding-l);
+
+            img {
+                height: inherit;
+                object-fit: cover;
+                border-radius: var(--radius-m);
+                border: 2px solid var(--background-color-400);
+            }
+        }
+
+        .preview-document__informations {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: var(--gap-m);
+
+            .preview-document__informations-content {
+                flex: 1;
+                min-height: 0;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                gap: var(--gap-m);
+
+                >*:not(p-selectbutton) {
+                    flex: 1 1 auto;
+                    min-height: 0;
+                    overflow-y: scroll;
+                }
+            }
+
+            .preview-document__informations-footer {
+                display: flex;
+                justify-content: flex-end;
+                gap: var(--gap-s);
+            }
+        }
+    }
+}

@@ -1,0 +1,35 @@
+<div class="table__container">
+    <div class="table__wrapper">
+        <div class="search__wrapper">
+            <input pInputText [(ngModel)]="search" type="text" pSize="small" placeholder="Rechercher"
+                (ngModelChange)="onSearchChange()" />
+            <p-multiselect [options]="cols" [(ngModel)]="searchOnlyCols" optionLabel="field" size="small"
+                placeholder="Rechercher sur les champs" [showHeader]="false" (ngModelChange)="onSearchChange()"
+                selectedItemsLabel="{0} champs sélectionnés" />
+        </div>
+        <p-table [value]="searchData" size="small" paginator="true" [rows]="20"
+            selectionMode="single" (selectionChange)="onSelectionChange($event)"
+            responsiveLayout="scroll">
+            <ng-template #caption>
+                <span class="table-title">{{ tableTitle }} ({{ data ? data.length : 0 }})</span>
+            </ng-template>
+            <ng-template #header>
+                <tr>
+                    <th *ngFor="let col of cols" [pSortableColumn]="col.sortable ? col.field : undefined">
+                        {{ col.header }}
+                        <p-sortIcon [field]="col.field" *ngIf="col.sortable"></p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template #body let-searchData>
+                <tr [pSelectableRow]="searchData">
+                    <td *ngFor="let col of cols">
+                        {{ searchData[col.field] }}
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template #paginatorleft>
+            </ng-template>
+        </p-table>
+    </div>
+</div>

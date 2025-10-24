@@ -1,0 +1,9 @@
+.preview-document-details__wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap-l);
+
+    .extended {
+        grid-column: span 2;
+    }
+}

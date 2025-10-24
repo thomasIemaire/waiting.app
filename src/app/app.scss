@@ -1,0 +1,72 @@
+.app__container {
+    overflow: hidden;
+    padding: var(--padding-l);
+    width: 100dvw;
+    height: 100dvh;
+
+    .app__wrapper {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-l);
+
+        .header__container {
+            width: 100%;
+            height: var(--height-static-header);
+
+            .header__wrapper {
+                gap: var(--gap-l);
+
+                app-brand {
+                    width: var(--width-static-sidebar);
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                app-header {
+                    flex: 1;
+                    height: 100%;
+                }
+            }
+        }
+
+        .content__container {
+            width: 100%;
+            max-height: calc(100dvw - var(--height-static-header) - (2 * var(--padding-l)));
+            overflow-y: auto;
+            flex: 1;
+
+            .content__wrapper {
+                gap: calc(var(--gap-l) / 2);
+
+                app-sidebar {
+                    width: var(--width-static-sidebar);
+                    height: 100%;
+                }
+            }
+        }
+
+        .header__wrapper,
+        .content__wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+    }
+}
+
+::ng-deep {
+    .content__wrapper {
+        >*:not(app-sidebar, router-outlet) {
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+            flex: 1;
+        }
+    }
+}

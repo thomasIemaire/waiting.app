@@ -1,0 +1,48 @@
+.table__container {
+    width: 100%;
+    height: 100%;
+
+    .table__wrapper {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-l);
+
+        .search__wrapper {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: var(--gap-m);
+
+            input,
+            p-multiselect {
+                min-width: 256px;
+                max-width: 256px;
+            }
+        }
+
+        p-table {
+            width: 100%;
+            height: 100%;
+            flex: 1;
+        }
+    }
+}
+
+::ng-deep {
+    :root {
+        --p-datatable-header-background: transparent !important;
+        --p-paginator-background: transparent !important;
+
+    }
+
+    .p-datatable-table-container {
+        height: calc(100% - 50px - 36px) !important;
+    }
+
+    .table-title {
+        font-size: 16px;
+        font-weight: 600;
+    }
+}

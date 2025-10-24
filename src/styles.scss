@@ -1,1 +1,134 @@
-/* You can add global styles to this file, and also import other style files */
+@import "primeicons/primeicons.css";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root {
+    --height-static-header: 64px;
+    --width-static-sidebar: 224px;
+
+    --width-expanded-sidebar: var(--width-static-sidebar);
+    --width-collapsed-sidebar: var(--height-static-header);
+
+    --gmp-static-s: .25rem;
+    --gmp-static-m: .5rem;
+    --gmp-static-l: 1rem;
+    --gmp-static-xl: 2rem;
+
+    --gap-s: var(--gmp-static-s);
+    --gap-m: var(--gmp-static-m);
+    --gap-l: var(--gmp-static-l);
+    --gap-xl: var(--gmp-static-xl);
+
+    --margin-s: var(--gmp-static-s);
+    --margin-m: var(--gmp-static-m);
+    --margin-l: var(--gmp-static-l);
+    --margin-xl: var(--gmp-static-xl);
+
+    --padding-s: var(--gmp-static-s);
+    --padding-m: var(--gmp-static-m);
+    --padding-l: var(--gmp-static-l);
+    --padding-xl: var(--gmp-static-xl);
+
+    --radius-s: calc(var(--gmp-static-s) / 2);
+    --radius-m: calc(var(--gmp-static-m) / 2);
+    --radius-l: calc(var(--gmp-static-l) / 2);
+    --radius-xl: calc(var(--gmp-static-xl) / 2);
+}
+
+:root {
+    --background-color-50: var(--p-surface-50);
+    --background-color-100: var(--p-surface-100);
+    --background-color-200: var(--p-surface-200);
+    --background-color-300: var(--p-surface-300);
+    --background-color-400: var(--p-surface-400);
+    --background-color-500: var(--p-surface-500);
+    --background-color-600: var(--p-surface-600);
+    --background-color-700: var(--p-surface-700);
+    --background-color-800: var(--p-surface-800);
+    --background-color-900: var(--p-surface-900);
+    --background-color-950: var(--p-surface-950);
+}
+
+.app-dark:root {
+    --background-color-50: var(--p-surface-950);
+    --background-color-100: var(--p-surface-900);
+    --background-color-200: var(--p-surface-800);
+    --background-color-300: var(--p-surface-700);
+    --background-color-400: var(--p-surface-600);
+    --background-color-500: var(--p-surface-500);
+    --background-color-600: var(--p-surface-400);
+    --background-color-700: var(--p-surface-300);
+    --background-color-800: var(--p-surface-200);
+    --background-color-900: var(--p-surface-100);
+    --background-color-950: var(--p-surface-50);
+}
+
+* {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+
+    ::after,
+    ::before {
+        box-sizing: inherit;
+    }
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100dvh;
+    width: 100dvw;
+    font-size: 14px;
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    line-height: normal;
+    color: var(--p-text-color);
+    background-color: var(--background-color-50);
+}
+
+::selection {
+    background-color: var(--p-text-color);
+    color: var(--background-color-50);
+}
+
+.p-select-option,
+.p-multiselect-option {
+    font-size: var(--p-inputtext-sm-font-size) !important;
+    padding-block: var(--p-inputtext-sm-padding-y) !important;
+    padding-inline: var(--p-inputtext-sm-padding-x) !important;
+
+    .with-actions {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .item-label {
+            pointer-events: none;
+        }
+
+        .action {
+            cursor: pointer;
+            margin-left: 8px;
+            pointer-events: auto;
+            font-size: .75rem !important;
+        }
+    }
+}
+
+p-breadcrumb .p-breadcrumb {
+    background: transparent !important;
+    padding: 0 !important;
+
+    .p-icon {
+        height: .5rem !important;
+        width: .5rem !important;
+    }
+}
+
+.p-tooltip-text {
+    font-size: 0.75rem !important;
+    padding: .25rem .5rem !important;
+}
