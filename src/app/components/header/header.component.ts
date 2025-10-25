@@ -4,11 +4,12 @@ import { filter, map, startWith, Subscription } from 'rxjs';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { MenuItem } from 'primeng/api';
 import { UserAvatarDetailsComponent } from "../user-avatar-details/user-avatar-details.component";
-
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-header',
-  imports: [BreadcrumbModule, UserAvatarDetailsComponent],
+  imports: [BreadcrumbModule, UserAvatarDetailsComponent, ButtonModule, TooltipModule],
   template: `
   <div class="header__container">
     <div class="header__wrapper">
@@ -18,6 +19,7 @@ import { UserAvatarDetailsComponent } from "../user-avatar-details/user-avatar-d
       </div>
       <div class="header-right__wrapper">
         <app-user-avatar-details />
+         <p-button variant="text" severity="secondary" size="small" icon="pi pi-sign-out" pTooltip="Se déconnecter" tooltipPosition="left" />
       </div>
     </div>
   </div>

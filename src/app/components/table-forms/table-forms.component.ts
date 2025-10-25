@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, Input } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { InputTextModule } from 'primeng/inputtext';
-import { Column } from "../../../../components/table/table.component";
+import { Column } from "../table/table.component";
 import { ButtonModule } from "primeng/button";
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -22,13 +22,13 @@ export interface TableFormItem {
 }
 
 @Component({
-    selector: 'app-preview-document-table-forms',
+    selector: 'app-table-forms',
     imports: [CommonModule, FormsModule, InputTextModule, ButtonModule, TooltipModule],
     template: `
-    <div class="preview-document-table-forms__wrapper">
-        <div class="preview-document-table-forms__label">{{ form.label }}</div>
-        <div class="preview-document-table-forms__group-items">
-            <table class="preview-document-table-forms__table">
+    <div class="table-forms__wrapper">
+        <div class="table-forms__label">{{ form.label }}</div>
+        <div class="table-forms__group-items">
+            <table class="table-forms__table">
                 <thead>
                     <tr>
                         <td class="table-header__label" *ngFor="let col of form.cols">{{ col.header }}</td>
@@ -47,9 +47,9 @@ export interface TableFormItem {
         </div>
     </div>
     `,
-    styleUrls: ['./preview-document-table-forms.component.scss']
+    styleUrls: ['./table-forms.component.scss']
 })
-export class PreviewDocumentTableFormsComponent {
+export class TableFormsComponent {
     @Input({ required: true }) form!: TableForm;
 
     public addLine(): void {

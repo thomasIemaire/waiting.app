@@ -1,13 +1,13 @@
 <div class="table__container">
     <div class="table__wrapper">
         <div class="search__wrapper">
-            <input pInputText [(ngModel)]="search" type="text" pSize="small" placeholder="Rechercher"
+            <input pInputText [(ngModel)]="search" type="text" pSize="small" [placeholder]="`Rechercher dans ${tableTitle.toLocaleLowerCase()}`"
                 (ngModelChange)="onSearchChange()" />
             <p-multiselect [options]="cols" [(ngModel)]="searchOnlyCols" optionLabel="field" size="small"
                 placeholder="Rechercher sur les champs" [showHeader]="false" (ngModelChange)="onSearchChange()"
                 selectedItemsLabel="{0} champs sélectionnés" />
         </div>
-        <p-table [value]="searchData" paginator="true" [rows]="20"
+        <p-table [value]="searchData" [paginator]="true" [rows]="20"
             selectionMode="single" (selectionChange)="onSelectionChange($event)"
             responsiveLayout="scroll">
             <ng-template #caption>

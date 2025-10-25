@@ -14,9 +14,15 @@
             flex-direction: column;
 
             .header-left__title {
-                font-size: 20px;
+                font-size: 18px;
                 font-weight: 600;
             }
+        }
+
+        .header-right__wrapper {
+            display: flex;
+            align-items: center;
+            gap: var(--gap-m);
         }
     }
 }

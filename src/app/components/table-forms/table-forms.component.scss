@@ -1,31 +1,31 @@
-.preview-document-table-forms__wrapper {
+.table-forms__wrapper {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: var(--gap-m);
 
-    .preview-document-table-forms__label {
-        font-size: 14px;
+    .table-forms__label {
+        font-size: .875rem;
         font-weight: 600;
     }
 
-    .preview-document-table-forms__group-items {
+    .table-forms__group-items {
         display: flex;
         flex-direction: column;
         gap: var(--gap-s);
 
-        .preview-document-table-forms__item {
+        .table-forms__item {
             display: flex;
             flex-direction: column;
 
-            .preview-document-table-forms__item-label {
+            .table-forms__item-label {
                 font-size: 12px;
             }
         }
 
-        .preview-document-table-forms__table {
+        .table-forms__table {
             .table-header__label {
-                font-size: 12px;
+                font-size: .75rem;
             }
         }
     }

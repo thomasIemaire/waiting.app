@@ -1,15 +1,15 @@
 import { Component } from "@angular/core";
-import { Form, PreviewDocumentFormsComponent } from "../preview-document-forms/preview-document-forms.component";
-import { PreviewDocumentTableFormsComponent, TableForm } from "../preview-document-table-forms/preview-document-table-forms.component";
+import { Form, FormsComponent } from "../../../../components/forms/forms.component";
+import { TableFormsComponent, TableForm } from "../../../../components/table-forms/table-forms.component";
 
 @Component({
     selector: 'app-preview-document-details',
-    imports: [PreviewDocumentTableFormsComponent, PreviewDocumentFormsComponent],
+    imports: [TableFormsComponent, FormsComponent],
     template: `
     <div class="preview-document-details__wrapper">
-        <app-preview-document-table-forms [form]="lineForm" class="extended" />
-        <app-preview-document-forms [form]="supplierForm" />
-        <app-preview-document-forms [form]="customerForm" />
+        <app-table-forms [form]="lineForm" class="extended" />
+        <app-forms [form]="supplierForm" />
+        <app-forms [form]="customerForm" />
     </div>
     `,
     styleUrls: ['./preview-document-details.component.scss']

@@ -1,15 +1,15 @@
 import { Component } from "@angular/core";
-import { Form, PreviewDocumentFormsComponent } from "../preview-document-forms/preview-document-forms.component";
+import { Form, FormsComponent } from "../../../../components/forms/forms.component";
 
 @Component({
     selector: 'app-preview-document-globals',
-    imports: [PreviewDocumentFormsComponent],
+    imports: [FormsComponent],
     template: `
     <div class="preview-document-globals__wrapper">
-        <app-preview-document-forms [form]="documentForm" />
+        <app-forms [form]="documentForm" />
         <div></div>
-        <app-preview-document-forms [form]="supplierForm" />
-        <app-preview-document-forms [form]="customerForm" />
+        <app-forms [form]="supplierForm" />
+        <app-forms [form]="customerForm" />
     </div>
     `,
     styleUrls: ['./preview-document-globals.component.scss']
@@ -37,7 +37,7 @@ export class PreviewDocumentGlobalsComponent {
             { label: 'Code Postal', value: '75001' },
             { label: 'Pays', value: 'France' },
             { label: 'TVA Intracommunautaire', value: 'FR123456789', required: true },
-            { label: 'SIREN', value: '123 456 789', required: true },
+            { label: 'SIREN', value: '123 456 789', required: true, calculated: true },
         ]
     };
 
@@ -50,7 +50,7 @@ export class PreviewDocumentGlobalsComponent {
             { label: 'Code Postal', value: '69001' },
             { label: 'Pays', value: 'France' },
             { label: 'TVA Intracommunautaire', value: 'FR987654321' },
-            { label: 'SIREN', value: '987 654 321' },
+            { label: 'SIREN', value: '987 654 321', calculated: true },
         ]
     };
 }

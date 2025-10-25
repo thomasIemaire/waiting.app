@@ -34,6 +34,8 @@
     --radius-m: calc(var(--gmp-static-m) / 2);
     --radius-l: calc(var(--gmp-static-l) / 2);
     --radius-xl: calc(var(--gmp-static-xl) / 2);
+
+    
 }
 
 :root {
@@ -116,6 +118,22 @@ body {
             font-size: .75rem !important;
         }
     }
+}
+
+.p-datatable-tbody > tr > td {
+    font-size: .75rem !important;
+    padding: .5rem .75rem !important;
+}
+
+.p-datatable-thead > tr > th,
+.p-datatable-sort-icon,
+.p-datatable-sort-badge {
+    font-size: .875rem !important;
+}
+
+.p-datatable-sort-icon {
+    width: .75rem !important;
+    height: .75rem !important;
 }
 
 p-breadcrumb .p-breadcrumb {

@@ -8,6 +8,9 @@ import { PreviewDocumentGlobalsComponent } from "./preview-document-globals/prev
 import { PreviewDocumentDetailsComponent } from "./preview-document-details/preview-document-details.component";
 import { MessageService } from "primeng/api";
 import { ToastModule } from "primeng/toast";
+import { DialogService, DynamicDialogRef } from "primeng/dynamicdialog";
+import { SaveFooterComponent } from "../../../components/save-footer/save-footer.component";
+import { FormsComponent } from "../../../components/forms/forms.component";
 
 @Component({
     selector: 'app-preview-document',
@@ -17,10 +20,7 @@ import { ToastModule } from "primeng/toast";
     <div class="preview-document__wrapper">
         <div class="preview-document__header">
             <p-button variant="text" severity="secondary" size="small" label="Retour" icon="pi pi-arrow-left" (onClick)="backDocuments()" />
-            <div class="preview-document__header-alert">
-                <i class="pi pi-exclamation-triangle"></i>
-                <span>Cette facture contient un nouveau client, cliquer pour en savoir plus.</span>
-            </div>
+            <p-button variant="text" severity="warn" size="small" label="Cette facture contient un nouveau client, cliquer pour en savoir plus." icon="pi pi-exclamation-triangle" (onClick)="addCustomer()"/>
         </div>
         <div class="preview-document__content">
             <div class="preview-document__image">
@@ -28,7 +28,7 @@ import { ToastModule } from "primeng/toast";
             </div>
             <div class="preview-document__informations">
                 <div class="preview-document__informations-content">
-                    <p-selectbutton [options]="previewOpts" [(ngModel)]="selectOpt" optionLabel="label" optionValue="value" size="small" fluid />
+                    <p-selectbutton [options]="previewOpts" [(ngModel)]="selectOpt" [allowEmpty]="false" optionLabel="label" optionValue="value" size="small" fluid />
                     @switch (selectOpt) {
                     @case ('globals') {
                     <app-preview-document-globals />
@@ -48,14 +48,17 @@ import { ToastModule } from "primeng/toast";
     </div>
     `,
     styleUrls: ['./preview-document.component.scss'],
-    providers: [MessageService]
+    providers: [MessageService, DialogService]
 })
 export class PreviewDocumentComponent {
     private messageService: MessageService = inject(MessageService);
     private router: Router = inject(Router);
+    private dialogService: DialogService = inject(DialogService);
 
     public base64: string | null = null;
     public previewSrc: string | null = null;
+
+    public ref?: DynamicDialogRef | null;
 
     public previewOpts = [
         { label: 'Informations générales', value: 'globals' },
@@ -66,6 +69,31 @@ export class PreviewDocumentComponent {
 
     public backDocuments(): void {
         this.router.navigate(['/documents']);
+    }
+
+    public addCustomer(): void {
+        this.ref = this.dialogService.open(FormsComponent, {
+            inputValues: {
+                form: {
+                    items: [
+                        { label: 'Nom', value: 'Client 1', required: true },
+                        { label: 'Rue', value: '20 Avenue des Champs' },
+                        { label: 'Ville', value: 'Lyon' },
+                        { label: 'Code Postal', value: '69001' },
+                        { label: 'Pays', value: 'France' },
+                        { label: 'TVA Intracommunautaire', value: 'FR987654321' },
+                        { label: 'SIREN', value: '987 654 321' },
+                    ]
+                }
+            },
+            header: 'Nouveau client',
+            width: '512px',
+            modal: true,
+            contentStyle: { overflow: 'auto' },
+            templates: {
+                footer: SaveFooterComponent
+            }
+        });
     }
 
     async ngOnInit(): Promise<void> {

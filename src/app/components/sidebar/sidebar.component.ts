@@ -54,9 +54,9 @@ export class SidebarComponent {
                 link: '/documents'
             },
             {
-                label: 'Contacts',
+                label: 'Clients',
                 icon: 'pi pi-users',
-                link: '/contacts'
+                link: '/customers'
             },
             {
                 label: 'Fournisseurs',

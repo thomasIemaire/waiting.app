@@ -5,18 +5,18 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from "primeng/api";
 
 @Component({
-    selector: 'app-contacts',
+    selector: 'app-customers',
     imports: [CommonModule, TableComponent, ToastModule],
     template: `
     <p-toast />
-    <div class="contacts__wrapper">
-        <app-table tableTitle="Vos contacts" [cols]="cols" [data]="[]"></app-table>
+    <div class="customers__wrapper">
+        <app-table tableTitle="Vos clients" [cols]="cols" [data]="[]"></app-table>
     </div>
     `,
-    styleUrls: ['./contacts.component.scss'],
+    styleUrls: ['./customers.component.scss'],
     providers: [MessageService]
 })
-export class ContactsComponent {
+export class CustomersComponent {
     public cols: Column[] = [
         { field: 'nom', header: 'Nom' },
         { field: 'type', header: 'Type' },

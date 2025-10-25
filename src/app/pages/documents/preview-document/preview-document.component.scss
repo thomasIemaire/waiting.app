@@ -11,16 +11,6 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-
-        .preview-document__header-alert {
-            display: flex;
-            align-items: center;
-            gap: var(--gap-s);
-            color: var(--p-orange-500);
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-        }
     }
 
     .preview-document__content {
