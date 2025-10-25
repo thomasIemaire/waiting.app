@@ -31,11 +31,12 @@ export interface TableFormItem {
             <table class="table-forms__table">
                 <thead>
                     <tr>
-                        <td class="table-header__label" *ngFor="let col of form.cols">{{ col.header }}</td>
+                        <td class="table-header__label" *ngFor="let col of cols">{{ col.header }}</td>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let row of form.rows">
+                    <tr *ngFor="let row of form.rows; let i = index">
+                        <p-button variant="text" severity="secondary" size="small" [label]="(i + 1).toString()" />
                         <td *ngFor="let col of form.cols">
                             <input pInputText [(ngModel)]="row.items[col.field].value" type="text" pSize="small" fluid [disabled]="row.items[col.field].disabled || false" />
                         </td>
@@ -51,6 +52,15 @@ export interface TableFormItem {
 })
 export class TableFormsComponent {
     @Input({ required: true }) form!: TableForm;
+
+    public cols: Column[] = [];
+
+    ngOnInit() {
+        this.cols = [
+            { field: 'index', header: '' },
+            ...this.form.cols
+        ];
+    }
 
     public addLine(): void {
         const newRow: TableFormRow = {
