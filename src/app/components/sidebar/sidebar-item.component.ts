@@ -25,7 +25,7 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
         gap: 1.2rem;
         cursor: pointer;
         user-select: none;
-        border-radius: .5rem;
+        border-radius: var(--radius-m);
         font-size: .75rem !important;
         color: var(--p-text-muted-color);
 

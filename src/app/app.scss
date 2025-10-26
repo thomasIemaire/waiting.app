@@ -35,7 +35,6 @@
 
         .content__container {
             width: 100%;
-            max-height: calc(100dvw - var(--height-static-header) - (2 * var(--padding-l)));
             overflow-y: auto;
             flex: 1;
 

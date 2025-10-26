@@ -5,9 +5,11 @@ import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
 import { defaultTheme } from './static/theme/default';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideHttpClient(withInterceptorsFromDi()),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),

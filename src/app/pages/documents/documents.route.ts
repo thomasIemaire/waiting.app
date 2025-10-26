@@ -7,17 +7,17 @@ export const documentsRoutes: Routes = [
     {
         path: '',
         component: DocumentsComponent,
-        title: "Gérez vos documents",
+        title: "Gérez mes documents",
         children: [
             {
                 path: '',
                 component: DocumentsTableComponent,
-                title: "Gérez vos documents"
+                title: "Gérez mes documents"
             },
             {
                 path: ':id',
                 component: PreviewDocumentComponent,
-                title: "Gérez vos documents"
+                title: "Gérez mes documents"
             }
         ]
     }

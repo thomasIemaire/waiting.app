@@ -19,7 +19,7 @@ export interface FormItem {
     template: `
     <div class="input-w-label__item-label">{{ label }}<span *ngIf="required" class="required-indicator">*</span></div>
     <div class="input-w-label__item-input">
-        <input pInputText [(ngModel)]="value" type="text" pSize="small" fluid [disabled]="disabled"/>
+        <input pInputText [(ngModel)]="value" type="text" pSize="small" fluid [disabled]="disabled" [placeholder]="label ? label : ''" />
         <p-button text severity="secondary" size="small" icon="pi pi-sparkles" *ngIf="calculated" pTooltip="Valeur interprétée" tooltipPosition="left"></p-button>
     </div>
     `,

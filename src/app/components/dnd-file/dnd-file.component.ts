@@ -46,7 +46,7 @@ export class DndFileComponent {
 
     get labelPlural(): string {
         return this.multiple
-            ? `Glisser-déposer vos ${this.label}s ici ou cliquer pour les importer`
+            ? `Glisser-déposer mes ${this.label}s ici ou cliquer pour les importer`
             : `Glisser-déposer votre ${this.label} ici ou cliquer pour l'importer`;
     }
 

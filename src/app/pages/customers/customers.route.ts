@@ -5,6 +5,6 @@ export const customersRoutes: Routes = [
     {
         path: '',
         component: CustomersComponent,
-        title: "Gérez vos clients",
+        title: "Gérez mes clients",
     }
 ];

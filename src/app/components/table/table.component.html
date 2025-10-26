@@ -11,7 +11,7 @@
             selectionMode="single" (selectionChange)="onSelectionChange($event)"
             responsiveLayout="scroll">
             <ng-template #caption>
-                <span class="table-title">{{ tableTitle }} ({{ data ? data.length : 0 }})</span>
+                <span class="table-title">{{ tableTitle }} · {{ data ? data.length : 0 }}</span>
             </ng-template>
             <ng-template #header>
                 <tr>

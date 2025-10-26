@@ -10,7 +10,7 @@ import { MessageService } from "primeng/api";
     template: `
     <p-toast />
     <div class="customers__wrapper">
-        <app-table tableTitle="Vos clients" [cols]="cols" [data]="[]"></app-table>
+        <app-table tableTitle="Mes clients" [cols]="cols" [data]="[]"></app-table>
     </div>
     `,
     styleUrls: ['./customers.component.scss'],

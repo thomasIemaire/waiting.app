@@ -5,7 +5,7 @@ import { Router } from "@angular/router";
 @Component({
     selector: 'app-documents-table',
     template: `
-    <app-table tableTitle="Vos documents" [cols]="cols" [data]="data" (selectionChange)="onSelectionChange($event)"></app-table>
+    <app-table tableTitle="Mes documents" [cols]="cols" [data]="data" (selectionChange)="onSelectionChange($event)"></app-table>
     `,
     styleUrls: ['./documents-table.component.scss'],
     imports: [TableComponent],

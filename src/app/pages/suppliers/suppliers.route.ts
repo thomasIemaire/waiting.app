@@ -5,6 +5,6 @@ export const suppliersRoutes: Routes = [
     {
         path: '',
         component: SuppliersComponent,
-        title: "Gérez vos fournisseurs",
+        title: "Gérez mes fournisseurs",
     }
 ];
