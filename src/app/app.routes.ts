@@ -12,5 +12,13 @@ export const routes: Routes = [
     {
         path: 'suppliers',
         loadChildren: () => import('./pages/suppliers/suppliers.route').then(m => m.suppliersRoutes)
+    },
+    {
+        path: 'agents',
+        loadChildren: () => import('./pages/agents/agents.route').then(m => m.agentsRoutes)
+    },
+    {
+        path: 'flows',
+        loadChildren: () => import('./pages/flows/flows.route').then(m => m.flowsRoutes)
     }
 ];

@@ -21,12 +21,12 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
         width: 100%;
         display: flex;
         align-items: center;
-        padding: .6rem 1.2rem;
+        padding: .5rem 1rem;
         gap: 1.2rem;
         cursor: pointer;
         user-select: none;
         border-radius: .5rem;
-        font-size: .875rem !important;
+        font-size: .75rem !important;
         color: var(--p-text-muted-color);
 
         &.active,

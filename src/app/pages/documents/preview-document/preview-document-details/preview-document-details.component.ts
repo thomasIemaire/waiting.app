@@ -31,7 +31,7 @@ export class PreviewDocumentDetailsComponent {
                     reference: { value: 'REF001' },
                     label: { value: 'Produit A' },
                     quantity: { value: 2 },
-                    unitPrice: { value: '100 €' },
+                    unitPrice: { value: '100 €', calculated: true },
                     totalExclTax: { value: '200 €' },
                     taxRate: { value: '20%' },
                 }

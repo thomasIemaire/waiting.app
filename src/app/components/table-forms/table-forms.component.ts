@@ -5,6 +5,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Column } from "../table/table.component";
 import { ButtonModule } from "primeng/button";
 import { TooltipModule } from 'primeng/tooltip';
+import { FormItem, InputWLabelComponent } from "../input-w-label/input-w-label.component";
 
 export interface TableForm {
     label: string;
@@ -13,17 +14,12 @@ export interface TableForm {
 }
 
 export interface TableFormRow {
-    items: { [key: string]: TableFormItem; };
-}
-
-export interface TableFormItem {
-    value: string | number;
-    disabled?: boolean;
+    items: { [key: string]: FormItem; };
 }
 
 @Component({
     selector: 'app-table-forms',
-    imports: [CommonModule, FormsModule, InputTextModule, ButtonModule, TooltipModule],
+    imports: [CommonModule, FormsModule, InputTextModule, ButtonModule, TooltipModule, InputWLabelComponent],
     template: `
     <div class="table-forms__wrapper">
         <div class="table-forms__label">{{ form.label }}</div>
@@ -38,7 +34,7 @@ export interface TableFormItem {
                     <tr *ngFor="let row of form.rows; let i = index">
                         <p-button variant="text" severity="secondary" size="small" [label]="(i + 1).toString()" />
                         <td *ngFor="let col of form.cols">
-                            <input pInputText [(ngModel)]="row.items[col.field].value" type="text" pSize="small" fluid [disabled]="row.items[col.field].disabled || false" />
+                            <app-input-w-label [value]="row.items[col.field].value" [disabled]="row.items[col.field].disabled || false" [calculated]="row.items[col.field].calculated || false" />
                         </td>
                         <p-button variant="text" severity="danger" size="small" icon="pi pi-minus" (onClick)="removeLine(row)" pTooltip="Supprimer la ligne" tooltipPosition="left" />
                     </tr>
