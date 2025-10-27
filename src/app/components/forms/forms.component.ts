@@ -11,23 +11,24 @@ export interface Form {
 @Component({
     selector: 'app-forms',
     imports: [CommonModule, FormsModule, InputWLabelComponent],
+    standalone: true,
     template: `
     <div class="forms__wrapper">
-        <div class="forms__label" *ngIf="form.label">{{ form.label }}</div>
-        <div class="forms__group-items">
-            <div *ngFor="let item of form.items" class="forms__item">
-                <app-input-w-label 
-                    [type]="item.type"
-                    [label]="item.label ?? ''"
-                    [value]="item.value"
-                    [required]="item.required || false"
-                    [disabled]="item.disabled || false"
-                    [calculated]="item.calculated || false"
-                />
-            </div>
+      <div class="forms__label" *ngIf="form.label">{{ form.label }}</div>
+      <div class="forms__group-items">
+        <div *ngFor="let item of form.items" class="forms__item">
+          <app-input-w-label
+            [type]="item.type ?? 'text'"
+            [label]="item.label ?? ''"
+            [(value)]="item.value"
+            [required]="item.required || false"
+            [disabled]="item.disabled || false"
+            [calculated]="item.calculated || false"
+          />
         </div>
+      </div>
     </div>
-    `,
+  `,
     styleUrls: ['./forms.component.scss']
 })
 export class FormsComponent {

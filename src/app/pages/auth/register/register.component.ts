@@ -11,12 +11,12 @@ import { MessageModule } from "primeng/message";
     imports: [CommonModule, FormsComponent, ButtonModule, MessageModule],
     template: `
     <div class="register__wrapper">
+        <div *ngIf="messages.length" class="register__messages">
+            <p-message size="small" *ngFor="let message of messages" [severity]="message.severity">
+                {{ message.detail }}
+            </p-message>
+        </div>
         <div class="register__form">
-            <div *ngIf="messages.length" class="register__messages">
-                <p-message *ngFor="let message of messages" [severity]="message.severity">
-                    {{ message.detail }}
-                </p-message>
-            </div>
             <app-forms [form]="activeForm" />
             <div class="register__actions">
                 <p-button text severity="secondary" label="Retour" size="small" (click)="stepper(currentStep - 1)" [disabled]="currentStep === 1"></p-button>

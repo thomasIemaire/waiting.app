@@ -11,12 +11,12 @@ import { CommonModule } from "@angular/common";
     imports: [CommonModule, FormsComponent, ButtonModule, MessageModule],
     template: `
     <div class="signin__wrapper">
+        <div *ngIf="messages.length" class="signin__messages">
+            <p-message size="small" *ngFor="let message of messages" [severity]="message.severity">
+                {{ message.detail }}
+            </p-message>
+        </div>
         <div class="signin__form">
-            <div *ngIf="messages.length" class="signin__messages">
-                <p-message *ngFor="let message of messages" [severity]="message.severity">
-                    {{ message.detail }}
-                </p-message>
-            </div>
             <app-forms [form]="formSignin" />
             <div class="signin__actions">
                 <p-button label="Se connecter" size="small" class="signin__button" (click)="onSubmit()"></p-button>
@@ -58,7 +58,7 @@ export class SigninComponent {
         this.messages = [];
 
         const email = this.formSignin.items[0].value?.trim() ?? '';
-        const password = this.formSignin.items[1].value ?? '';
+        const password = this.formSignin.items[1].value ?? '';        
 
         if (!email || !password) {
             this.messages = [{ severity: 'error', detail: 'Veuillez saisir votre email et votre mot de passe.' }];
