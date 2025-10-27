@@ -1,0 +1,42 @@
+.register__wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-xl);
+
+    .register__form {
+        width: 100%;
+        max-width: 256px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--gap-m);
+
+        app-forms {
+            width: 100%;
+        }
+
+        .register__actions {
+            display: flex;
+            gap: var(--gap-s);
+        }
+    }
+
+    .register__footer {
+        font-size: .75rem !important;
+        display: flex;
+        align-items: center;
+        gap: var(--gap-s);
+
+        .register__link {
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}

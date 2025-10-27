@@ -4,8 +4,10 @@ import { FormsModule } from "@angular/forms";
 import { ButtonModule } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
 import { Tooltip } from "primeng/tooltip";
+import { PasswordModule } from 'primeng/password';
 
 export interface FormItem {
+    type?: string;
     label?: string;
     value: any;
     required?: boolean;
@@ -15,11 +17,18 @@ export interface FormItem {
 
 @Component({
     selector: 'app-input-w-label',
-    imports: [CommonModule, FormsModule, InputTextModule, Tooltip, ButtonModule],
+    imports: [CommonModule, FormsModule, InputTextModule, Tooltip, ButtonModule, PasswordModule],
     template: `
     <div class="input-w-label__item-label">{{ label }}<span *ngIf="required" class="required-indicator">*</span></div>
     <div class="input-w-label__item-input">
-        <input pInputText [(ngModel)]="value" type="text" pSize="small" fluid [disabled]="disabled" [placeholder]="label ? label : ''" />
+        @switch (type) {
+            @case('password') {
+                <p-password [(ngModel)]="value" [feedback]="false" size="small" fluid [disabled]="disabled" [placeholder]="label ? label : ''" [toggleMask]="true" />
+            }
+            @default {
+                <input pInputText [(ngModel)]="value" [type]="type" pSize="small" fluid [disabled]="disabled" [placeholder]="label ? label : ''" />
+            }
+        }
         <p-button text severity="secondary" size="small" icon="pi pi-sparkles" *ngIf="calculated" pTooltip="Valeur interprétée" tooltipPosition="left"></p-button>
     </div>
     `,
@@ -36,6 +45,9 @@ export interface FormItem {
     `
 })
 export class InputWLabelComponent {
+    @Input()
+    public type?: string = 'text';
+
     @Input()
     public label: string = '';
 

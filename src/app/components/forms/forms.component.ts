@@ -16,7 +16,14 @@ export interface Form {
         <div class="forms__label" *ngIf="form.label">{{ form.label }}</div>
         <div class="forms__group-items">
             <div *ngFor="let item of form.items" class="forms__item">
-                <app-input-w-label [label]="item.label ?? ''" [value]="item.value" [required]="item.required || false" [disabled]="item.disabled || false" [calculated]="item.calculated || false"/>
+                <app-input-w-label 
+                    [type]="item.type"
+                    [label]="item.label ?? ''"
+                    [value]="item.value"
+                    [required]="item.required || false"
+                    [disabled]="item.disabled || false"
+                    [calculated]="item.calculated || false"
+                />
             </div>
         </div>
     </div>

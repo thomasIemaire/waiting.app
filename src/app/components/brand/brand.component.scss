@@ -1,14 +1,17 @@
 .brand__container {
     .brand__wrapper {
+        /* échelle par défaut */
+        --brand-scale: 1;
+
         display: flex;
         flex-direction: row;
         align-items: center;
-        gap: .25rem;
+        gap: calc(.25rem * var(--brand-scale));
 
-        font-size: 20px;
+        font-size: calc(20px * var(--brand-scale));
         font-weight: 600;
-        font-style: lowercase;
-
+        text-transform: lowercase;
+        /* (optionnel) corrige font-style */
         user-select: none;
 
         .brand__left-part {
@@ -17,13 +20,13 @@
 
         .brand__right-part {
             color: #fff;
-            letter-spacing: -2px;
-            padding: .1rem .75rem .1rem .5rem;
+            letter-spacing: calc(-2px * var(--brand-scale));
+            padding: calc(.1rem * var(--brand-scale)) calc(.75rem * var(--brand-scale)) calc(.1rem * var(--brand-scale)) calc(.5rem * var(--brand-scale));
             background-color: var(--p-primary-500);
-            border-radius: 2px 0 2px 2px;
+            border-radius: calc(2px * var(--brand-scale)) 0 calc(2px * var(--brand-scale)) calc(2px * var(--brand-scale));
             position: relative;
-            
-            --brand-corner-size: .75rem;
+
+            --brand-corner-size: calc(.75rem * var(--brand-scale));
 
             &::after,
             &::before {
@@ -36,7 +39,7 @@
             }
 
             &::after {
-                border-radius: 0 0 0 2px;
+                border-radius: 0 0 0 calc(2px * var(--brand-scale));
                 border-bottom: var(--brand-corner-size) solid #e73c7e;
                 border-right: var(--brand-corner-size) solid transparent;
             }
@@ -45,6 +48,10 @@
                 border-top: var(--brand-corner-size) solid var(--background-color-50);
                 border-left: var(--brand-corner-size) solid transparent;
             }
+        }
+
+        &.large {
+            --brand-scale: 1.5;
         }
     }
 }
