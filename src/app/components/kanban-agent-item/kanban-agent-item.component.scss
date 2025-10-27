@@ -1,0 +1,77 @@
+.kanban-agent-item__wrapper {
+    width: 100%;
+    padding: var(--padding-m);
+    border-radius: var(--radius-m);
+    background-color: var(--background-color-100);
+    border: 1px solid var(--background-color-200);
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    
+    .kanban-agent-item__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .kanban-agent-item__header-names {
+            display: flex;
+            align-items: flex-end;
+            gap: var(--gap-s);
+
+            .kanban-agent-item__header-name {
+                font-weight: 600;
+                font-size: 0.875rem;
+            }
+
+            .kanban-agent-item__header-reference {
+                font-size: 0.625rem;
+                color: var(--p-text-muted-color);
+            }
+        }
+    }
+
+    .kanban-agent-item__body {
+        .kanban-agent-item__body-details {
+            font-size: .75rem;
+            color: var(--p-text-muted-color);
+        }
+    }
+
+    .kanban-agent-item__footer {
+        display: flex;
+        align-items: center;
+        gap: var(--gap-s);
+
+        .kanban-agent-item__footer-avatar {
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 50%;
+            background-color: var(--background-color-200);
+        }
+
+        .kanban-agent-item__footer-info {
+            display: flex;
+            flex-direction: column;
+
+            .kanban-agent-item__footer-user {
+                font-weight: 500;
+                font-size: 0.625rem;
+            }
+
+            .kanban-agent-item__footer-date {
+                font-size: 0.5rem;
+                color: var(--p-text-muted-color);
+            }
+        }
+    }
+}
+
+::ng-deep {
+    .p-tag {
+        font-size: 0.625rem !important;
+        font-weight: 500 !important;
+        padding: 0.2rem 0.4rem !important;
+        gap: 0px !important;
+    }
+}

@@ -6,6 +6,16 @@
     border-radius: var(--radius-l);
     background-color: var(--background-color-100);
 
+    &.kanban-board-item__container.is-drag-over-allowed .kanban-board-item__wrapper {
+        border-color: var(--p-primary-500);
+        background-color: var(--background-color-300);
+    }
+
+    &.kanban-board-item__container.is-drag-over-forbidden .kanban-board-item__wrapper {
+        border-color: var(--p-red-500);
+        background-color: var(--background-color-300);
+    }
+
     .kanban-board-item__wrapper {
         height: 100%;
         width: 100%;
@@ -60,6 +70,21 @@
                         color: var(--background-color-300);
                         font-size: .875rem;
                         cursor: pointer;
+                    }
+                }
+
+                .kanban-board-item-section-list {
+                    flex: 1 1 auto;
+                    min-height: 0;
+                    overflow-y: auto;
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--gap-s);
+
+                    .kanban-card {
+                        &.is-draggable {
+                            cursor: grab;
+                        }
                     }
                 }
             }

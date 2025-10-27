@@ -39,7 +39,6 @@ export interface Column { field: string; header?: string; }
         [options]="cols"
         [(ngModel)]="filterOnCol"
         optionLabel="field"
-        optionValue="field"
         placeholder="Selectionner un champ" />
       <p-button
         text severity="secondary" type="button"
@@ -66,12 +65,17 @@ export interface Column { field: string; header?: string; }
 })
 export class KanbanComponent {
     @Input({ required: true }) public items!: KanbanItem[];
+    @Input({ required: true }) public cols!: Column[];
 
     public search = '';
-    public cols: Column[] = [];
     public searchOnlyCols: Column[] = [];
     public filterOnCol = '';
     public sortOrder: number = 1;
+
+    ngOnInit() {
+        this.searchOnlyCols = [...this.cols];
+        this.filterOnCol = this.cols.length ? this.cols[0].field : '';
+    }
 
     onColumnsFound(fields: string[]) {
         const existing = new Set(this.cols.map(c => c.field));

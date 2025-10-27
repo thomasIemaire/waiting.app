@@ -13,6 +13,7 @@ export class MenuItem {
     icon?: string
     link?: string;
     command?: () => void;
+    enabled?: boolean;
 }
 
 @Component({
@@ -77,7 +78,8 @@ export class SidebarComponent {
             {
                 label: 'Flows',
                 icon: 'pi pi-sitemap',
-                link: '/flows'
+                link: '/flows',
+                enabled: false
             }
         ]
     };

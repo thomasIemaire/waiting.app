@@ -21,7 +21,7 @@
 
         &.dragover {
             border-color: var(--p-primary-500);
-            background-color: rgba(59, 130, 246, 0.06);
+            background-color: var(--background-color-300);
         }
 
         .dnd-file__icon {
