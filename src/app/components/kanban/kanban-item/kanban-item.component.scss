@@ -8,12 +8,12 @@
 
     &.kanban-board-item__container.is-drag-over-allowed .kanban-board-item__wrapper {
         border-color: var(--p-primary-500);
-        background-color: var(--background-color-300);
+        background-color: var(--background-color-200);
     }
 
     &.kanban-board-item__container.is-drag-over-forbidden .kanban-board-item__wrapper {
-        border-color: var(--p-red-500);
-        background-color: var(--background-color-300);
+        border-color: var(--background-color-500);
+        background-color: var(--background-color-200);
     }
 
     .kanban-board-item__wrapper {

@@ -1,10 +1,11 @@
 import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, inject, Input, OnInit, Output, Type } from "@angular/core";
+import { Component, EventEmitter, ViewChild, inject, Input, OnInit, Output, Type } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { MessageService } from "primeng/api";
+import { MessageService, MenuItem } from "primeng/api";
 import { ApiService } from "../../../core/services/api.service";
 import { DynamicHostDirective } from "../../../core/directives/dynamic-host.directive";
 import { DragPayload, KanbanDragService } from "../../../core/services/kanban-drag.service";
+import { ContextMenuModule, ContextMenu } from 'primeng/contextmenu';
 
 export interface KanbanItem {
     id: string;
@@ -21,7 +22,7 @@ export interface KanbanSection {
     name: string;
     endpoint: string;
     add?: boolean;
-    draggable?: boolean;     // ⬅️ prise en compte
+    draggable?: boolean;
     component: Type<any>;
 }
 interface Column { field: string; header?: string; }
@@ -29,8 +30,11 @@ interface Column { field: string; header?: string; }
 @Component({
     selector: 'app-kanban-item',
     standalone: true,
-    imports: [CommonModule, FormsModule, DynamicHostDirective],
+    imports: [CommonModule, FormsModule, DynamicHostDirective, ContextMenuModule],
     template: `
+  <!-- Menu contextuel global, affiché au clic droit d'une carte -->
+  <p-contextmenu #cardMenu [model]="cardMenuItems"></p-contextmenu>
+
   <div class="kanban-board-item__container"
        (dragenter)="onContainerDragEnter($event)"
        (dragleave)="onContainerDragLeave($event)"
@@ -69,7 +73,8 @@ interface Column { field: string; header?: string; }
                  [class.is-draggable]="isCardDraggable(section, card)"
                  [attr.draggable]="isCardDraggable(section, card) ? true : null"
                  (dragstart)="onDragStart(section, card, i, $event)"
-                 (dragend)="onDragEnd($event)">
+                 (dragend)="onDragEnd($event)"
+                 (contextmenu)="onCardContextMenu($event, section, card)">
 
               <ng-container
                 [appDynamicHost]="section.component"
@@ -104,6 +109,18 @@ export class KanbanItemComponent implements OnInit {
 
     public data: Record<string, any[]> = {};
     public loading: Record<string, boolean> = {};
+
+    // ----- Context menu -----
+    @ViewChild('cardMenu') cardMenu!: ContextMenu;
+    public cardMenuItems: MenuItem[] = [
+        {
+            label: 'Supprimer',
+            icon: 'pi pi-trash',
+            command: () => this.deleteContextCard()
+        }
+    ];
+    private ctxSection?: KanbanSection;
+    private ctxRecord: any | undefined;
 
     ngOnInit() {
         for (const section of this.item.sections) {
@@ -320,12 +337,9 @@ export class KanbanItemComponent implements OnInit {
             return;
         }
 
-        const isSameKanban = (p.providerId === this.item.id); // sera toujours false ici
-        const recToAdd = isSameKanban ? p.record : this.cloneRecord(p.record);
-
+        const recToAdd = this.cloneRecord(p.record);
         this.addCard(target, recToAdd);
 
-        // inter-kanban => move seulement si la source n'est pas en copie
         if (!p.copyOnExternalDrop) {
             try { p.removeFromSource(); } catch { }
         }
@@ -337,7 +351,7 @@ export class KanbanItemComponent implements OnInit {
         });
     }
 
-    onDragStart(section: KanbanSection, card: any, index: number, ev: DragEvent) {
+    onDragStart(section: KanbanSection, card: any, _index: number, ev: DragEvent) {
         // ⛔ Si la carte n'est pas draggable, on annule tout de suite
         if (!this.isCardDraggable(section, card)) {
             ev.preventDefault();
@@ -353,7 +367,8 @@ export class KanbanItemComponent implements OnInit {
             providerId: this.item.id,
             fromSection: section.name,
             record: card,
-            removeFromSource: () => this.removeCard(section, index),
+            // ⚠️ Retrait par record pour être robuste au tri/filtre
+            removeFromSource: () => this.removeCardByRecord(section, card),
             copyOnExternalDrop: !!this.item.copyOnExternalDrop
         });
     }
@@ -364,7 +379,8 @@ export class KanbanItemComponent implements OnInit {
 
     // Règle d’acceptation :
     private canAccept(p: DragPayload): boolean {
-        if (p.providerId === this.item.id) return true; // même kanban
+        // Refus direct pour même conteneur (cohérent avec l’UX)
+        if (p.providerId === this.item.id) return false;
         const cfg = this.item.dropable;
         if (!cfg?.enabled) return false;
         return (cfg.acceptedFrom || []).includes(p.providerId);
@@ -385,8 +401,34 @@ export class KanbanItemComponent implements OnInit {
         const arr = this.data[section.name] || [];
         if (index >= 0 && index < arr.length) arr.splice(index, 1);
     }
+    private removeCardByRecord(section: KanbanSection, record: any) {
+        const arr = this.data[section.name] || [];
+        const idx = arr.findIndex(x => x === record || (x?.id && record?.id && x.id === record.id));
+        if (idx >= 0) arr.splice(idx, 1);
+    }
     private addCard(section: KanbanSection, record: any) {
         const arr = this.data[section.name] || (this.data[section.name] = []);
         arr.push(record);
+    }
+
+    // --------- Context menu handlers ----------
+    onCardContextMenu(event: MouseEvent, section: KanbanSection, record: any) {
+        this.ctxSection = section;
+        this.ctxRecord = record;
+        this.cardMenu.show(event);
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    deleteContextCard() {
+        if (!this.ctxSection || !this.ctxRecord) return;
+        this.removeCardByRecord(this.ctxSection, this.ctxRecord);
+        this.messages.add({ severity: 'success', summary: 'Supprimé', detail: 'La carte a été supprimée.' });
+        this.clearContext();
+    }
+
+    private clearContext() {
+        this.ctxSection = undefined;
+        this.ctxRecord = undefined;
     }
 }
