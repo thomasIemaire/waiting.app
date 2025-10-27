@@ -19,7 +19,7 @@ export class App {
 
   ngOnInit() {
     this.userService.user.value$.subscribe(user => {
-      if (user) this.user = user;
+      this.user = user;
     });
   }
 
