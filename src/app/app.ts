@@ -4,6 +4,7 @@ import { SidebarComponent } from "./components/sidebar/sidebar.component";
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
 import { User, UserService } from './core/services/user.service';
+import { ThemeService } from './core/services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,7 @@ export class App {
 
   public user: User | null = null;
 
+  private themeService: ThemeService = inject(ThemeService);
   private userService: UserService = inject(UserService);
 
   ngOnInit() {
