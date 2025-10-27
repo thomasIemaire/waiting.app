@@ -1,4 +1,5 @@
-import { Component, inject } from "@angular/core";
+import { Component, DestroyRef, inject } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { UserService, User } from "../../core/services/user.service";
 
 @Component({
@@ -18,13 +19,16 @@ import { UserService, User } from "../../core/services/user.service";
     styleUrls: ['./user-avatar-details.component.scss'],
 })
 export class UserAvatarDetailsComponent {
-    public userService: UserService = inject(UserService);
+    private readonly userService: UserService = inject(UserService);
+    private readonly destroyRef: DestroyRef = inject(DestroyRef);
 
-    public user!: User;
+    public user: User = new User();
 
-    ngOnInit() {
-        this.userService.user.value$.subscribe(user => {
-            this.user = user!;
-        });
+    constructor() {
+        this.userService.user.value$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((user) => {
+                this.user = user ? new User(user) : new User();
+            });
     }
 }

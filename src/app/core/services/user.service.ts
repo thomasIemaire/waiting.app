@@ -21,13 +21,6 @@ export class User {
     providedIn: 'root'
 })
 export class UserService {
-    private readonly DEFAULT_USER: any = {
-        id: 'default-user-id',
-        email: 'john.doe@example.com',
-        firstname: 'John',
-        lastname: 'Doe'
-    };
-
     private readonly USER_STORAGE_KEY = 'app-user';
 
     public user: Behavior<User | null> = new Behavior<User | null>(null);
@@ -36,7 +29,9 @@ export class UserService {
 
     constructor() {
         this.storageService.getAndSetItem(this.USER_STORAGE_KEY, (user: User | null) => {
-            this.setUser(new User(user || this.DEFAULT_USER));
+            if (user) {
+                this.setUser(new User(user));
+            }
         });
     }
 

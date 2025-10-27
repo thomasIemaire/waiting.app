@@ -6,6 +6,7 @@ import { MenuItem } from 'primeng/api';
 import { UserAvatarDetailsComponent } from "../user-avatar-details/user-avatar-details.component";
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -19,7 +20,7 @@ import { TooltipModule } from 'primeng/tooltip';
       </div>
       <div class="header-right__wrapper">
         <app-user-avatar-details />
-         <p-button variant="text" severity="secondary" size="small" icon="pi pi-sign-out" pTooltip="Se déconnecter" tooltipPosition="left" />
+         <p-button variant="text" severity="secondary" size="small" icon="pi pi-sign-out" pTooltip="Se déconnecter" tooltipPosition="left" (click)="onSignout()" />
       </div>
     </div>
   </div>
@@ -28,6 +29,7 @@ import { TooltipModule } from 'primeng/tooltip';
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   title = '';
   breadcrumb: MenuItem[] = [];
@@ -61,6 +63,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.sub?.unsubscribe();
+  }
+
+  onSignout(): void {
+    this.authService.signout();
   }
 
   private buildBreadcrumb(url: string): MenuItem[] {
