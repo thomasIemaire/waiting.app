@@ -5,6 +5,7 @@ import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
 import { User, UserService } from './core/services/user.service';
 import { ThemeService } from './core/services/theme.service';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -18,11 +19,14 @@ export class App {
 
   private themeService: ThemeService = inject(ThemeService);
   private userService: UserService = inject(UserService);
+  private authService: AuthService = inject(AuthService);
 
   ngOnInit() {
     this.userService.user.value$.subscribe(user => {
       this.user = user;
     });
+
+    this.authService.signinWithToken();
   }
 
 }

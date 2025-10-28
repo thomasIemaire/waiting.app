@@ -21,14 +21,20 @@
         gap: var(--gap-xl);
 
         .preview-document__image {
+            max-width: 50%;
             height: 100%;
             background-color: var(--background-color-100);
             border-radius: var(--radius-l);
             padding: var(--padding-l);
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
             img {
-                height: inherit;
-                object-fit: cover;
+                width: 100%;
+                // height: inherit;
+                max-height: -webkit-fill-available;
+                object-fit: contain;
                 border-radius: var(--radius-m);
                 border: 1px solid var(--background-color-300);
                 cursor: pointer;

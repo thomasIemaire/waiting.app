@@ -24,7 +24,7 @@ export class MenuItem {
     <div class="sidebar__container">
         <div class="sidebar__wrapper">
             <div class="menu__container">
-                <div class="menu__wrapper" *ngFor="let menu of menus">
+                <div class="menu__wrapper" *ngFor="let menu of this.userService.getUser()?.isAdmin() ? [adminMenu, mainMenu] : [mainMenu]">
                     <span class="menu__label">{{ menu.label }}</span>
                     <div class="menu__items">
                         <app-sidebar-item *ngFor="let item of menu.items" [item]="item" />
@@ -42,7 +42,7 @@ export class MenuItem {
 export class SidebarComponent {
 
     private themeService: ThemeService = inject(ThemeService);
-    private userService: UserService = inject(UserService);
+    public userService: UserService = inject(UserService);
 
     public menus: Menu[] = [];
 
@@ -67,7 +67,7 @@ export class SidebarComponent {
         ]
     };
 
-    private adminMenu: Menu = {
+    public adminMenu: Menu = {
         label: 'Administration',
         items: [
             {
@@ -98,11 +98,6 @@ export class SidebarComponent {
     ];
 
     ngOnInit(): void {
-        this.menus = [
-            this.userService.getUser()?.isAdmin() ? this.adminMenu : {},
-            this.mainMenu
-        ].filter(menu => menu.items && menu.items.length > 0) as Menu[];
-
         this.themeService.theme.value$.subscribe(() => {
             this.settings[0].label = this.themeService.isDarkMode() ? 'Mode clair' : 'Mode sombre';
             this.settings[0].icon = this.themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon';

@@ -58,6 +58,21 @@ export class AuthService {
         }
     }
 
+    public async signinWithToken(): Promise<User> {
+        const token = this.tokenService.getToken();
+        if (!token) {
+            throw new Error('No token available');
+        }
+        try {
+            const response: any = await firstValueFrom(this.apiService.post('auth/token', { token }));
+            const { authenticatedUser, token: newToken, refreshToken } = this.saveUserAndTokensFromResponse(response);
+            return authenticatedUser;
+        } catch (err: any) {
+            this.signout();
+            throw new Error(err?.error?.message || 'Session expirée, veuillez vous reconnecter.');
+        }
+    }
+
     private saveUserAndTokensFromResponse(response: any): any {
         const user = response.user;
         const token = response.token;
