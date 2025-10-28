@@ -3,6 +3,7 @@ import { ProgressBar } from 'primeng/progressbar';
 import { Utils } from '../../core/utils/utils';
 import { TruncateTextPipe } from '../../core/pipes/truncate-text.pipe';
 import { MessageService } from 'primeng/api';
+import { DocumentsService } from '../../core/services/documents.service';
 
 export interface Base64File {
     name: string;
@@ -38,6 +39,7 @@ export class DndFileComponent {
     @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
     private messageService: MessageService = inject(MessageService);
+    private documentsService: DocumentsService = inject(DocumentsService);
 
     isDragOver = false;
 
@@ -119,9 +121,10 @@ export class DndFileComponent {
 
         try {
             for (const file of files) {
+                await this.documentsService.uploadDocument(file).then((data) => {
+                    ids.push(data._id);
+                });
                 this.fileUploading = file;
-                ids.push(String(new Date().getTime()));
-                await Utils.delay(2000);
             }
         } finally {
             this.fileUploading = null;
