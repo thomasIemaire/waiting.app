@@ -34,7 +34,7 @@ export interface TableFormRow {
                     <tr *ngFor="let row of form.rows; let i = index">
                         <p-button variant="text" severity="secondary" size="small" [label]="(i + 1).toString()" />
                         <td *ngFor="let col of form.cols">
-                            <app-input-w-label [(ngModel)]="row.items[col.field].value" [disabled]="row.items[col.field].disabled || false" [calculated]="row.items[col.field].calculated || false" />
+                            <app-input-w-label [(value)]="row.items[col.field].value" [disabled]="row.items[col.field].disabled || false" [calculated]="row.items[col.field].calculated || false" />
                         </td>
                         <p-button variant="text" severity="danger" size="small" icon="pi pi-minus" (onClick)="removeLine(row)" pTooltip="Supprimer la ligne" tooltipPosition="left" />
                     </tr>
