@@ -28,8 +28,8 @@ export class DocumentsService {
 
     public async getDocuments(): Promise<any[]> {
         try {
-            const response: any = await firstValueFrom(this.apiService.get(`documents`));
-            return response.documents;
+            const response: any = await firstValueFrom(this.apiService.get(`documents/`));
+            return response;
         } catch (err: any) {
             throw new Error(err?.error?.message || 'Une erreur est survenue lors de la récupération des documents.');
         }
