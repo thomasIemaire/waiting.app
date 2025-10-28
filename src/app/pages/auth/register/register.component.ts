@@ -5,6 +5,7 @@ import { Router } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { AuthService } from "../../../core/services/auth.service";
 import { MessageModule } from "primeng/message";
+import { Utils } from "../../../core/utils/utils";
 
 @Component({
     selector: 'app-register',
@@ -38,7 +39,6 @@ export class RegisterComponent {
     public formRegisterEmail = {
         items: [
             {
-                type: 'input',
                 label: 'Email',
                 value: '',
             }
@@ -48,13 +48,11 @@ export class RegisterComponent {
     public formRegisterNames = {
         items: [
             {
-                type: 'input',
-                label: 'Nom',
+                label: 'Prénom',
                 value: '',
             },
             {
-                type: 'input',
-                label: 'Prénom',
+                label: 'Nom',
                 value: '',
             }
         ]
@@ -79,13 +77,13 @@ export class RegisterComponent {
     public currentStep = 1;
     public messages: { severity: 'success' | 'info' | 'warn' | 'error'; detail: string }[] = [];
 
-    public stepper(step: number): void {
+    public async stepper(step: number): Promise<void> {
         this.messages = [];
 
         const targetStep = Math.min(Math.max(step, 1), 3);
 
         if (targetStep > this.currentStep) {
-            const canProceed = this.validateStep(this.currentStep);
+            const canProceed = await this.validateStep(this.currentStep);
             if (!canProceed) {
                 return;
             }
@@ -115,13 +113,13 @@ export class RegisterComponent {
     public async onSubmit(): Promise<void> {
         this.messages = [];
 
-        if (!this.validateStep(1) || !this.validateStep(2) || !this.validateStep(3)) {
+        if (!(await this.validateStep(1)) || !(await this.validateStep(2)) || !(await this.validateStep(3))) {
             return;
         }
 
         const email = this.formRegisterEmail.items[0].value?.trim() ?? '';
-        const lastname = this.formRegisterNames.items[0].value?.trim() ?? '';
-        const firstname = this.formRegisterNames.items[1].value?.trim() ?? '';
+        const firstname = this.formRegisterNames.items[0].value?.trim() ?? '';
+        const lastname = this.formRegisterNames.items[1].value?.trim() ?? '';
         const password = this.formRegisterPassword.items[0].value ?? '';
         const confirmPassword = this.formRegisterPassword.items[1].value ?? '';
 
@@ -140,7 +138,7 @@ export class RegisterComponent {
         }
     }
 
-    private validateStep(step: number): boolean {
+    private async validateStep(step: number): Promise<boolean> {
         switch (step) {
             case 1: {
                 const email = this.formRegisterEmail.items[0].value?.trim() ?? '';
@@ -154,11 +152,32 @@ export class RegisterComponent {
                     this.messages = [{ severity: 'error', detail: 'Veuillez saisir un email valide.' }];
                     return false;
                 }
+
+                try {
+                    const exists = await this.authService.checkEmailExists(email);
+                    if (exists) {
+                        this.messages = [{ severity: 'error', detail: 'Cet email est déjà utilisé.' }];
+                        return false;
+                    }
+                } catch (e) {
+                    this.messages = [{ severity: 'error', detail: 'Erreur lors de la vérification de l\'email.' }];
+                    return false;
+                }
+
+                if (email.endsWith('@sendoc.fr')
+                    && !this.formRegisterNames.items[0].value
+                    && !this.formRegisterNames.items[1].value) {
+                    const names = email.split('@')[0].split('.');
+                    this.formRegisterNames.items[0].value = Utils.toCapitalize(names[0]);
+                    this.formRegisterNames.items[1].value = Utils.toCapitalize(names[1]).split('+')[0];
+                }
+
                 return true;
             }
             case 2: {
-                const lastname = this.formRegisterNames.items[0].value?.trim() ?? '';
-                const firstname = this.formRegisterNames.items[1].value?.trim() ?? '';
+                const firstname = this.formRegisterNames.items[0].value?.trim() ?? '';
+                const lastname = this.formRegisterNames.items[1].value?.trim() ?? '';
+
                 if (!lastname || !firstname) {
                     this.messages = [{ severity: 'error', detail: 'Veuillez renseigner votre nom et prénom.' }];
                     return false;
@@ -168,6 +187,7 @@ export class RegisterComponent {
             case 3: {
                 const password = this.formRegisterPassword.items[0].value ?? '';
                 const confirmPassword = this.formRegisterPassword.items[1].value ?? '';
+
                 if (!password || !confirmPassword) {
                     this.messages = [{ severity: 'error', detail: 'Veuillez saisir et confirmer votre mot de passe.' }];
                     return false;

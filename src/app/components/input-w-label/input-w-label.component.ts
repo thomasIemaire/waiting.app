@@ -43,6 +43,7 @@ export interface FormItem {
             pInputText
             [(ngModel)]="value"
             (ngModelChange)="valueChange.emit($event)"
+            (blur)="valueChange.emit(value)"
             [type]="type"
             pSize="small"
             fluid

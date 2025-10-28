@@ -12,14 +12,14 @@ import { UserService, User } from "../../core/services/user.service";
             <div class="user-email">{{ user.email }}</div>
         </div>
         <div class="user-avatar-details-right__wrapper">
-            <div class="user-avatar"></div>
+            <div class="user-avatar" [style.backgroundImage]="'url(' + userService.getAvatarUrl(user.id!) + ')'"></div>
         </div>
     </div>
     `,
     styleUrls: ['./user-avatar-details.component.scss'],
 })
 export class UserAvatarDetailsComponent {
-    private readonly userService: UserService = inject(UserService);
+    public readonly userService: UserService = inject(UserService);
     private readonly destroyRef: DestroyRef = inject(DestroyRef);
 
     public user: User = new User();

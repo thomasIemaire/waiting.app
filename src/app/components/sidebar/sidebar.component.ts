@@ -2,6 +2,7 @@ import { Component, inject } from "@angular/core";
 import { ThemeService } from "../../core/services/theme.service";
 import { CommonModule } from "@angular/common";
 import { SidebarItemComponent } from "./sidebar-item.component";
+import { UserService } from "../../core/services/user.service";
 
 class Menu {
     label?: string;
@@ -41,8 +42,7 @@ export class MenuItem {
 export class SidebarComponent {
 
     private themeService: ThemeService = inject(ThemeService);
-
-    public admin: boolean = true;
+    private userService: UserService = inject(UserService);
 
     public menus: Menu[] = [];
 
@@ -99,7 +99,7 @@ export class SidebarComponent {
 
     ngOnInit(): void {
         this.menus = [
-            this.admin ? this.adminMenu : {},
+            this.userService.getUser()?.isAdmin() ? this.adminMenu : {},
             this.mainMenu
         ].filter(menu => menu.items && menu.items.length > 0) as Menu[];
 
