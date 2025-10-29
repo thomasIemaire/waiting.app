@@ -12,10 +12,11 @@ import { DialogService, DynamicDialogRef } from "primeng/dynamicdialog";
 import { SaveFooterComponent } from "../../../components/save-footer/save-footer.component";
 import { FormsComponent } from "../../../components/forms/forms.component";
 import { DocumentsService } from "../../../core/services/documents.service";
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
     selector: 'app-preview-document',
-    imports: [CommonModule, FormsModule, SelectButtonModule, ButtonModule, PreviewDocumentGlobalsComponent, PreviewDocumentDetailsComponent, ToastModule],
+    imports: [CommonModule, FormsModule, SelectButtonModule, ButtonModule, PreviewDocumentGlobalsComponent, PreviewDocumentDetailsComponent, ToastModule, ProgressSpinnerModule],
     template: `
     <p-toast />
     <div class="preview-document__wrapper">
@@ -24,8 +25,11 @@ import { DocumentsService } from "../../../core/services/documents.service";
             <p-button variant="text" severity="warn" size="small" label="Cette facture contient un nouveau client, cliquer pour en savoir plus." icon="pi pi-exclamation-triangle" (onClick)="addCustomer()"/>
         </div>
         <div class="preview-document__content">
-            <div class="preview-document__image">
+            <div class="preview-document__image" [class.loading]="!previewSrc">
                 <img *ngIf="previewSrc" [src]="previewSrc" alt="Document Preview" draggable="false" />
+                 <div class="preview-document__image-loading" *ngIf="!previewSrc">
+                     <p-progress-spinner />
+                 </div>
             </div>
             <div class="preview-document__informations">
                 <div class="preview-document__informations-content">

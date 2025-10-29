@@ -30,6 +30,10 @@
             align-items: center;
             justify-content: center;
 
+            &.loading {
+                min-width: 30%;
+            }
+
             img {
                 width: 100%;
                 // height: inherit;
