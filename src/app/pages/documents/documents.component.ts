@@ -12,7 +12,9 @@ import { Router, RouterOutlet } from "@angular/router";
     template: `
     <p-toast />
     <div class="documents__wrapper">
-        <app-dnd-file label="document"
+        <app-dnd-file 
+            [mode]="isMobile ? 'mobile' : 'dragdrop'"
+            label="document"
             [acceptedFileTypes]="['.pdf', '.jpg', '.png']"
             (filesUploaded)="onFilesUploaded($event)"
             [autoUpload]="true"/>
@@ -24,6 +26,9 @@ import { Router, RouterOutlet } from "@angular/router";
 })
 export class DocumentsComponent {
     private router: Router = inject(Router);
+
+    public isMobile: boolean = /Mobi|Android|iPhone|iPad|iPod|Windows Phone|IEMobile|BlackBerry|BB10/i
+        .test(navigator.userAgent);
 
     onFilesUploaded(ids: string[]): void {
         this.router.navigate([`documents/${ids[0]}`]);

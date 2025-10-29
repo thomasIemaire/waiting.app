@@ -45,4 +45,49 @@
             }
         }
     }
+
+    /* --- UI mobile --- */
+    .file-mobile__wrapper {
+        width: 100%;
+        background-color: var(--background-color-100);
+        border: 1px solid var(--background-color-300);
+        border-radius: var(--radius-m);
+        padding: var(--padding-l);
+
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-m);
+
+        .file-mobile__buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--gap-m);
+
+            .file-mobile__btn {
+                width: 100%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: var(--gap-s);
+                padding: var(--padding-m);
+                border-radius: var(--radius-m);
+
+                i {
+                    font-size: 16px;
+                }
+            }
+        }
+
+        .file-mobile__hint {
+            text-align: center;
+            font-size: 12px;
+            color: var(--p-text-muted-color);
+        }
+
+        .file-mobile__uploading {
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap-s);
+        }
+    }
 }
