@@ -36,12 +36,15 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
                     <p-selectbutton [options]="previewOpts" [(ngModel)]="selectOpt" [allowEmpty]="false" optionLabel="label" optionValue="value" size="small" fluid />
                     @switch (selectOpt) {
                     @case ('globals') {
-                    <app-preview-document-globals />
+                    <app-preview-document-globals [data]="data" *ngIf="data" />
                     }
                     @case ('details') {
-                    <app-preview-document-details />
+                    <app-preview-document-details [data]="data" *ngIf="data" />
                     }
                     }
+                    <div class="preview-document__no-data" *ngIf="!data">
+                        <p-progress-spinner />
+                    </div>
                 </div>
                 <div class="preview-document__informations-footer">
                     <p-button variant="text" severity="secondary" size="small" label="Annuler" />
@@ -64,13 +67,15 @@ export class PreviewDocumentComponent {
 
     public base64: string | null = null;
     public previewSrc: string | null = null;
+    public data: any = null;
 
     public ref?: DynamicDialogRef | null;
 
-    public previewOpts = [
+    private DEFAULT_PREVIEW_OPTS = [
         { label: 'Informations générales', value: 'globals' },
-        { label: 'Détails de la facture', value: 'details' },
     ];
+
+    public previewOpts = this.DEFAULT_PREVIEW_OPTS;
 
     public selectOpt = 'globals';
 
@@ -115,6 +120,22 @@ export class PreviewDocumentComponent {
             if (this.base64) {
                 this.previewSrc = await this.base64ToFirstPageImage(this.base64);
             }
+        });
+
+        this.route.paramMap.subscribe(async params => {
+            const documentId = params.get('id');
+            if (!documentId)
+                return;
+
+            this.data = null;
+            this.previewOpts = this.DEFAULT_PREVIEW_OPTS;
+            this.selectOpt = 'globals';
+
+            const response = await this.documentsService.processDocument(documentId);
+            this.data = response;
+
+            if (this.data.type === 'facture')
+                this.previewOpts = [ ...this.previewOpts, { label: 'Détails de la facture', value: 'details' } ];
         });
     }
 

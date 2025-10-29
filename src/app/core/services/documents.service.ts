@@ -43,4 +43,13 @@ export class DocumentsService {
             throw new Error(err?.error?.message || 'Une erreur est survenue lors de la récupération du document.');
         }
     }
+
+    public async processDocument(id: string): Promise<any> {
+        try {
+            const response = await firstValueFrom(this.apiService.post(`ai/document`, { document_id: id }));
+            return response;
+        } catch (err: any) {
+            throw new Error(err?.error?.message || 'Une erreur est survenue lors du traitement du document.');
+        }
+    }
 }

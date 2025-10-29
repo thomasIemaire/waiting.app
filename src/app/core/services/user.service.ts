@@ -3,6 +3,8 @@ import { Behavior } from '../utils/behavior';
 import { StorageService } from './storage.service';
 import { Utils } from '../utils/utils';
 import { ApiService } from './api.service';
+import { firstValueFrom } from 'rxjs';
+import { AuthService } from './auth.service';
 
 export class User {
     id?: string;
@@ -57,6 +59,18 @@ export class UserService {
     public clearUser(): void {
         this.user.set(null);
         this.storageService.setItem(this.USER_STORAGE_KEY, null);
+    }
+
+    public restoreUserData(): Promise<void> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const response = await firstValueFrom(this.apiService.delete('users/me'));
+                resolve();
+            } catch (error) {
+                console.error('Error restoring user data:', error);
+                reject(error);
+            }
+        });
     }
 
     public getAvatarUrl(userId: string): string {
