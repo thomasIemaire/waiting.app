@@ -38,7 +38,7 @@ export interface TableFormRow {
                                 [(value)]="row.items[col.field].value"
                                 [disabled]="row.items[col.field].disabled || false"
                                 [required]="row.items[col.field].required || false"
-                                [advised]="row.items[col.field].advised || false"
+                                [recommended]="row.items[col.field].recommended || false"
                                 [calculated]="row.items[col.field].calculated || false"
                             />
                         </td>

@@ -11,7 +11,7 @@ export interface FormItem {
     label?: string;
     value: any;
     required?: boolean;
-    advised?: boolean;
+    recommended?: boolean;
     disabled?: boolean;
     calculated?: boolean;
 }
@@ -76,7 +76,7 @@ export class InputWLabelComponent {
     @Input() label: string = '';
     @Input() value: any = '';
     @Input() required: boolean = false;
-    @Input() advised: boolean = false;
+    @Input() recommended: boolean = false;
     @Input() disabled: boolean = false;
     @Input() calculated: boolean = false;
 
@@ -89,6 +89,6 @@ export class InputWLabelComponent {
     public get borderStyle(): string {
         if (!this.isEmpty) return '';
         return this.required ? '1px solid var(--p-red-500)' : 
-               this.advised ? '1px solid var(--p-orange-500)' : '';
+               this.recommended ? '1px solid var(--p-orange-500)' : '';
     }
 }

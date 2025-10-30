@@ -70,9 +70,9 @@ export class PreviewDocumentDetailsComponent {
         return {
             label: 'Montants de la facture',
             items: [
-                { label: 'HT', value: analysis?.amount?.ht ?? '', advised: true },
-                { label: 'TVA', value: analysis?.amount?.tva ?? '', advised: true },
-                { label: 'TTC', value: analysis?.amount?.ttc ?? '', advised: true }
+                { label: 'HT', value: analysis?.amount?.ht ?? '', recommended: true },
+                { label: 'TVA', value: analysis?.amount?.tva ?? '', recommended: true },
+                { label: 'TTC', value: analysis?.amount?.ttc ?? '', recommended: true }
             ]
         };
     }

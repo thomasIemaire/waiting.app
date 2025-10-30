@@ -22,7 +22,7 @@ export interface Form {
             [label]="item.label ?? ''"
             [(value)]="item.value"
             [required]="item.required || false"
-            [advised]="item.advised || false"
+            [recommended]="item.recommended || false"
             [disabled]="item.disabled || false"
             [calculated]="item.calculated || false"
           />
