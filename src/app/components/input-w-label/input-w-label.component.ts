@@ -11,6 +11,7 @@ export interface FormItem {
     label?: string;
     value: any;
     required?: boolean;
+    advised?: boolean;
     disabled?: boolean;
     calculated?: boolean;
 }
@@ -49,6 +50,7 @@ export interface FormItem {
             fluid
             [disabled]="disabled"
             [placeholder]="label ? label : ''"
+            [style.border]="borderStyle"
           />
         }
       }
@@ -74,8 +76,19 @@ export class InputWLabelComponent {
     @Input() label: string = '';
     @Input() value: any = '';
     @Input() required: boolean = false;
+    @Input() advised: boolean = false;
     @Input() disabled: boolean = false;
     @Input() calculated: boolean = false;
 
     @Output() valueChange = new EventEmitter<any>();
+
+    private get isEmpty(): boolean {
+        return this.value === null || this.value === undefined || this.value === '';
+    }
+
+    public get borderStyle(): string {
+        if (!this.isEmpty) return '';
+        return this.required ? '1px solid var(--p-red-500)' : 
+               this.advised ? '1px solid var(--p-orange-500)' : '';
+    }
 }

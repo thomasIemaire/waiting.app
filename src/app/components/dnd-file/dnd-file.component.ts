@@ -3,7 +3,6 @@ import { ProgressBar } from 'primeng/progressbar';
 import { TruncateTextPipe } from '../../core/pipes/truncate-text.pipe';
 import { MessageService } from 'primeng/api';
 import { DocumentsService } from '../../core/services/documents.service';
-import { Button } from 'primeng/button';
 
 export interface Base64File {
     name: string;
@@ -16,7 +15,7 @@ export interface Base64File {
 
 @Component({
     selector: 'app-dnd-file',
-    imports: [ProgressBar, TruncateTextPipe, Button],
+    imports: [ProgressBar, TruncateTextPipe],
     templateUrl: './dnd-file.component.html',
     styleUrls: ['./dnd-file.component.scss']
 })

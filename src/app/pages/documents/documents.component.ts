@@ -31,6 +31,7 @@ export class DocumentsComponent {
         .test(navigator.userAgent);
 
     onFilesUploaded(ids: string[]): void {
-        this.router.navigate([`documents/${ids[0]}`]);
+        if (ids[0])
+            this.router.navigate([`documents/${ids[0]}`]);
     }
 }

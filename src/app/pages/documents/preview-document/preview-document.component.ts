@@ -47,8 +47,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
                     </div>
                 </div>
                 <div class="preview-document__informations-footer">
-                    <p-button variant="text" severity="secondary" size="small" label="Annuler" />
-                    <p-button variant="text" severity="primary" size="small" label="Exporter" />
+                    <p-button variant="text" severity="secondary" size="small" label="Annuler" (click)="backDocuments()" />
+                    <p-button variant="text" severity="primary" size="small" label="Exporter" (click)="downloadResult()" />
                     <p-button severity="primary" size="small" label="Enregistrer" (click)="sendResult()"/>
                 </div>
             </div>
@@ -135,7 +135,7 @@ export class PreviewDocumentComponent {
             this.data = response;
 
             if (this.data.type === 'facture')
-                this.previewOpts = [ ...this.previewOpts, { label: 'Détails de la facture', value: 'details' } ];
+                this.previewOpts = [...this.previewOpts, { label: 'Détails de la facture', value: 'details' }];
         });
     }
 
@@ -145,6 +145,43 @@ export class PreviewDocumentComponent {
             summary: 'Document enregistré',
             detail: 'Le document sera transmis à notre PDP.',
         });
+    }
+
+    public downloadResult(): void {
+        if (!this.data || !this.data?.analysis) return;
+        try {
+            const json = JSON.stringify(this.data.analysis, null, 2);
+
+            const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+
+            const rawName = this.data?.filename.split('.')[0] ?? 'result';
+            const safeName = (rawName?.trim() || 'result')
+                .replace(/[\\/:*?"<>|]/g, '_');
+            const filename = safeName.toLowerCase().endsWith('.json')
+                ? safeName
+                : `${safeName}.json`;
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            this.messageService.add({
+                severity: 'info',
+                summary: 'Téléchargement en cours',
+                detail: `Le document "${filename}" est en cours de téléchargement.`,
+            });
+        } catch (e) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erreur de téléchargement',
+                detail: 'Impossible de générer le fichier JSON.',
+            });
+        }
     }
 
     private async base64ToFirstPageImage(base64: string): Promise<string> {
