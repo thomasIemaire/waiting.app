@@ -3,6 +3,10 @@
     grid-template-columns: 1fr 1fr;
     gap: var(--gap-l);
 
+    &.mobile {
+        grid-template-columns: 1fr !important;
+    }
+
     .extended {
         grid-column: span 2;
     }

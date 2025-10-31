@@ -1,15 +1,16 @@
-import { Component, Input } from "@angular/core";
+import { Component, EventEmitter, inject, Input, Output } from "@angular/core";
 import { Form, FormsComponent } from "../../../../components/forms/forms.component";
 import { TableFormsComponent, TableForm } from "../../../../components/table-forms/table-forms.component";
+import { DeviceService } from "../../../../core/services/device.service";
 
 @Component({
     selector: 'app-preview-document-details',
     imports: [TableFormsComponent, FormsComponent],
     template: `
-    <div class="preview-document-details__wrapper">
-        <app-table-forms [form]="lineForm" class="extended" />
-        <app-forms [form]="vatForm" />
-        <app-forms [form]="amountsForm" />
+    <div class="preview-document-details__wrapper" [class.mobile]="!deviceService.isDesktopSize">
+        <app-table-forms [(form)]="lineForm" class="extended" />
+        <app-forms [(form)]="vatForm" />
+        <app-forms [(form)]="amountsForm" />
     </div>
     `,
     styleUrls: ['./preview-document-details.component.scss']
@@ -17,9 +18,13 @@ import { TableFormsComponent, TableForm } from "../../../../components/table-for
 export class PreviewDocumentDetailsComponent {
     @Input() data?: any;
 
+    @Output() dataChange = new EventEmitter<any>();
+
     public lineForm!: TableForm;
     public vatForm!: Form;
     public amountsForm!: Form;
+
+    public deviceService: DeviceService = inject(DeviceService);
 
     ngOnInit() {
         this.initForms();

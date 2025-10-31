@@ -10,15 +10,14 @@ export class DocumentsService {
 
     public async uploadDocument(file: Base64File): Promise<any> {
         try {
-            const body = {
+            const response: any = await firstValueFrom(this.apiService.post(`documents/`, {
                 filename: file.name,
                 contentType: file.type,
                 data: file.base64
-            };
-            const response: any = await firstValueFrom(this.apiService.post(`documents/`, body));
+            }));
             return response;
         } catch (err: any) {
-            throw new Error(err?.error?.message || 'Une erreur est survenue lors de l\'upload du document.');
+            throw new Error(err?.error?.message || 'Une erreur est survenue lors de l\'envoi du document.');
         }
     }
 

@@ -6,6 +6,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { User, UserService } from './core/services/user.service';
 import { ThemeService } from './core/services/theme.service';
 import { AuthService } from './core/services/auth.service';
+import { DeviceService } from './core/services/device.service';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +21,8 @@ export class App {
   private themeService: ThemeService = inject(ThemeService);
   private userService: UserService = inject(UserService);
   private authService: AuthService = inject(AuthService);
+  
+  public deviceService: DeviceService = inject(DeviceService);
 
   ngOnInit() {
     this.userService.user.value$.subscribe(user => {

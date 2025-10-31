@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input } from "@angular/core";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { InputTextModule } from 'primeng/inputtext';
 import { Column } from "../table/table.component";
@@ -54,6 +54,8 @@ export interface TableFormRow {
 })
 export class TableFormsComponent {
     @Input({ required: true }) form!: TableForm;
+
+    @Output() formChange = new EventEmitter<TableForm>();
 
     public cols: Column[] = [];
 

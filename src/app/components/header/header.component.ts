@@ -7,6 +7,7 @@ import { UserAvatarDetailsComponent } from "../user-avatar-details/user-avatar-d
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { AuthService } from '../../core/services/auth.service';
+import { DeviceService } from '../../core/services/device.service';
 
 @Component({
   selector: 'app-header',
@@ -14,6 +15,7 @@ import { AuthService } from '../../core/services/auth.service';
   template: `
   <div class="header__container">
     <div class="header__wrapper">
+      @if (!deviceService.isMobileSize) {
       <div class="header-left__wrapper">
         <p-breadcrumb [model]="breadcrumb"></p-breadcrumb>
         <div class="header-left__title">{{ title }}</div>
@@ -22,6 +24,10 @@ import { AuthService } from '../../core/services/auth.service';
         <app-user-avatar-details />
          <p-button variant="text" severity="secondary" size="small" icon="pi pi-sign-out" pTooltip="Se déconnecter" tooltipPosition="left" (click)="onSignout()" />
       </div>
+      } @else {
+        <div></div>
+        <i class="pi pi-bars"></i>
+      }
     </div>
   </div>
   `,
@@ -30,6 +36,7 @@ import { AuthService } from '../../core/services/auth.service';
 export class HeaderComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private authService = inject(AuthService);
+  public deviceService = inject(DeviceService);
 
   title = '';
   breadcrumb: MenuItem[] = [];

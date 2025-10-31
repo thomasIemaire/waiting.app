@@ -1,18 +1,8 @@
-<div class="dnd-file__container" role="group" aria-label="Importer un fichier ou une photo">
-    <!-- Explorateur de fichiers (commun) -->
+<div class="dnd-file__container" role="button" tabindex="0" (click)="openFileDialog()" (keydown)="onKeydown($event)">
     <input #fileInput type="file" [attr.accept]="acceptAttr" [attr.multiple]="multiple ? '' : null"
         (change)="onFileSelect($event)" hidden />
-
-    <!-- Capture caméra (mobile) -->
-    <input #cameraInput type="file" accept="image/*" [attr.capture]="cameraFacing" (change)="onCameraCapture($event)"
-        hidden />
-
-    @if (mode === 'dragdrop') {
-    <!-- VOTRE UI ACTUELLE drag & drop -->
     <div class="dnd-file__wrapper" [class.dragover]="isDragOver" (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="openFileDialog()"
-        (keydown)="onKeydown($event)" tabindex="0" role="button">
-
+        (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
         @if (!isUploading) {
         <i class="dnd-file__icon pi pi-cloud-upload"></i>
         <div class="dnd-file__text">
@@ -30,34 +20,4 @@
         </div>
         }
     </div>
-    } @else {
-    <!-- NOUVELLE UI MOBILE -->
-    <div class="file-mobile__wrapper">
-        @if (!isUploading) {
-        <div class="file-mobile__buttons">
-            <button type="button" pButton (click)="openFileDialog()" class="file-mobile__btn" aria-label="Parcourir">
-                <i class="pi pi-folder-open"></i>
-                <span>Parcourir</span>
-            </button>
-
-            <button type="button" pButton (click)="openCamera()" class="file-mobile__btn"
-                aria-label="Prendre une photo">
-                <i class="pi pi-camera"></i>
-                <span>Prendre une photo</span>
-            </button>
-        </div>
-
-        <div class="file-mobile__hint dnd-file__text--secondary">
-            Types de fichiers acceptés : {{ acceptedFileTypes.join(', ') || 'Tous' }}
-        </div>
-        } @else {
-        <div class="file-mobile__uploading">
-            <div class="dnd-file__text--secondary">
-                Envoi de {{ fileUploading?.name | truncateText: 20 }} en cours...
-            </div>
-            <p-progressbar mode="indeterminate" [style]="{ height: '6px' }" />
-        </div>
-        }
-    </div>
-    }
 </div>

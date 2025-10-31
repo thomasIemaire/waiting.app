@@ -13,6 +13,7 @@ import { SaveFooterComponent } from "../../../components/save-footer/save-footer
 import { FormsComponent } from "../../../components/forms/forms.component";
 import { DocumentsService } from "../../../core/services/documents.service";
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { DeviceService } from "../../../core/services/device.service";
 
 @Component({
     selector: 'app-preview-document',
@@ -22,10 +23,11 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     <div class="preview-document__wrapper">
         <div class="preview-document__header">
             <p-button variant="text" severity="secondary" size="small" label="Retour" icon="pi pi-arrow-left" (onClick)="backDocuments()" />
-            <p-button variant="text" severity="warn" size="small" label="Cette facture contient un nouveau client, cliquer pour en savoir plus." icon="pi pi-exclamation-triangle" (onClick)="addCustomer()"/>
+            <p-button variant="text" severity="warn" size="small" icon="pi pi-exclamation-triangle" (onClick)="addCustomer()"
+                [label]="deviceService.isMobileSize ? 'Nouveau client détecté.' : 'Cette facture contient un nouveau client, cliquer pour en savoir plus.'" />
         </div>
         <div class="preview-document__content">
-            <div class="preview-document__image" [class.loading]="!previewSrc">
+            <div *ngIf="!deviceService.isMobileSize" class="preview-document__image" [class.loading]="!previewSrc">
                 <img *ngIf="previewSrc" [src]="previewSrc" alt="Document Preview" draggable="false" />
                  <div class="preview-document__image-loading" *ngIf="!previewSrc">
                      <p-progress-spinner />
@@ -35,11 +37,19 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
                 <div class="preview-document__informations-content">
                     <p-selectbutton [options]="previewOpts" [(ngModel)]="selectOpt" [allowEmpty]="false" optionLabel="label" optionValue="value" size="small" fluid />
                     @switch (selectOpt) {
+                    @case ('preview') {
+                    <div class="preview-document__image" [class.loading]="!previewSrc" [style.maxWidth.%]="100">
+                        <img *ngIf="previewSrc" [src]="previewSrc" alt="Document Preview" draggable="false" />
+                        <div class="preview-document__image-loading" *ngIf="!previewSrc">
+                            <p-progress-spinner />
+                        </div>
+                    </div>
+                    }
                     @case ('globals') {
-                    <app-preview-document-globals [data]="data" *ngIf="data" />
+                    <app-preview-document-globals [(data)]="data" *ngIf="data" />
                     }
                     @case ('details') {
-                    <app-preview-document-details [data]="data" *ngIf="data" />
+                    <app-preview-document-details [(data)]="data" *ngIf="data" />
                     }
                     }
                     <div class="preview-document__no-data" *ngIf="!data">
@@ -64,6 +74,7 @@ export class PreviewDocumentComponent {
     private route: ActivatedRoute = inject(ActivatedRoute);
     private dialogService: DialogService = inject(DialogService);
     private documentsService: DocumentsService = inject(DocumentsService);
+    public deviceService: DeviceService = inject(DeviceService);
 
     public base64: string | null = null;
     public previewSrc: string | null = null;
@@ -72,7 +83,7 @@ export class PreviewDocumentComponent {
     public ref?: DynamicDialogRef | null;
 
     private DEFAULT_PREVIEW_OPTS = [
-        { label: 'Informations générales', value: 'globals' },
+        { label: this.deviceService.isMobileSize ? 'Générales' : 'Informations générales', value: 'globals' },
     ];
 
     public previewOpts = this.DEFAULT_PREVIEW_OPTS;
@@ -114,6 +125,12 @@ export class PreviewDocumentComponent {
             if (!documentId)
                 return;
 
+            this.previewOpts = this.DEFAULT_PREVIEW_OPTS;
+            if (this.deviceService.isMobileSize) {
+                this.selectOpt = 'preview';
+                this.previewOpts = [{ label: 'Aperçu', value: 'preview' }, ...this.previewOpts];
+            }
+
             const response = await this.documentsService.getDocumentById(documentId);
             this.base64 = response.data;
 
@@ -128,14 +145,18 @@ export class PreviewDocumentComponent {
                 return;
 
             this.data = null;
-            this.previewOpts = this.DEFAULT_PREVIEW_OPTS;
-            this.selectOpt = 'globals';
 
             const response = await this.documentsService.processDocument(documentId);
             this.data = response;
 
-            if (this.data.type === 'facture')
-                this.previewOpts = [...this.previewOpts, { label: 'Détails de la facture', value: 'details' }];
+            switch (this.data.type) {
+                case 'facture':
+                    this.previewOpts = [...this.previewOpts, { label: this.deviceService.isMobileSize ? 'Détails' : 'Détails de la facture', value: 'details' }];
+                    break;
+                case 'bullet-de-paie':
+                    this.previewOpts = [...this.previewOpts, { label: this.deviceService.isMobileSize ? 'Détails' : 'Détails du bulletin de paie', value: 'details' }];
+                    break;
+            }
         });
     }
 

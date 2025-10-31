@@ -1,8 +1,10 @@
 import { Component, ElementRef, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
 import { ProgressBar } from 'primeng/progressbar';
+import { Utils } from '../../core/utils/utils';
 import { TruncateTextPipe } from '../../core/pipes/truncate-text.pipe';
 import { MessageService } from 'primeng/api';
 import { DocumentsService } from '../../core/services/documents.service';
+import { DeviceService } from '../../core/services/device.service';
 
 export interface Base64File {
     name: string;
@@ -20,52 +22,48 @@ export interface Base64File {
     styleUrls: ['./dnd-file.component.scss']
 })
 export class DndFileComponent {
-    /** Mode d'affichage : dragdrop (par défaut) ou mobile */
-    @Input() mode: 'dragdrop' | 'mobile' = 'dragdrop';
-
-    /** Caméra utilisée pour la capture (mobile) */
-    @Input() cameraFacing: 'user' | 'environment' = 'environment';
-
     @Input() multiple = false;
     @Input() label = 'fichier';
     @Input() acceptedFileTypes: string[] = [];
     @Input() autoUpload = false;
 
     @Output() fileBase64 = new EventEmitter<Base64File>();
+
     @Output() filesBase64 = new EventEmitter<Base64File[]>();
+
     @Output() filesUploaded = new EventEmitter<string[]>();
+
     @Output() change = new EventEmitter<Base64File | Base64File[]>();
+
     @Output() rejected = new EventEmitter<File[]>();
 
     @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-    @ViewChild('cameraInput') cameraInput!: ElementRef<HTMLInputElement>;
 
     private messageService: MessageService = inject(MessageService);
     private documentsService: DocumentsService = inject(DocumentsService);
+    private deviceService: DeviceService = inject(DeviceService);
 
     isDragOver = false;
+
     isUploading = false;
     fileUploading: Base64File | null = null;
 
     get labelPlural(): string {
+        let labelUnique = `Glisser-déposer votre ${this.label} ici ou cliquer pour l'importer`;
+        if (this.deviceService.isMobile)
+            labelUnique = `Appuyez pour importer votre ${this.label} ou prendre une photo`;
+
         return this.multiple
             ? `Glisser-déposer mes ${this.label}s ici ou cliquer pour les importer`
-            : `Glisser-déposer votre ${this.label} ici ou cliquer pour l'importer`;
+            : labelUnique;
     }
 
-    /** Accept pour le bouton "Parcourir" (respecte vos filtres) */
     get acceptAttr(): string {
         return (this.acceptedFileTypes ?? []).join(', ');
     }
 
-    /** Ouvre l’explorateur de fichiers */
     openFileDialog(): void {
         this.fileInput?.nativeElement.click();
-    }
-
-    /** Ouvre la caméra (mobile) via l’input capture */
-    openCamera(): void {
-        this.cameraInput?.nativeElement.click();
     }
 
     onKeydown(e: KeyboardEvent): void {
@@ -76,16 +74,6 @@ export class DndFileComponent {
     }
 
     onFileSelect(event: Event): void {
-        const input = event.target as HTMLInputElement;
-        const files = input.files;
-        if (files && files.length) {
-            this.processFiles(files);
-            input.value = '';
-        }
-    }
-
-    /** Capture de photo -> File -> base64 */
-    onCameraCapture(event: Event): void {
         const input = event.target as HTMLInputElement;
         const files = input.files;
         if (files && files.length) {
@@ -120,7 +108,7 @@ export class DndFileComponent {
         const results = await Promise.all(accepted.map((f) => this.fileToBase64(f)));
 
         if (this.autoUpload && results.length) {
-            const ids = await this.uploadFiles(results);
+            let ids = await this.uploadFiles(results);
             this.filesUploaded.emit(ids);
         }
 
@@ -135,18 +123,24 @@ export class DndFileComponent {
 
     private async uploadFiles(files: Base64File[]): Promise<string[]> {
         this.isUploading = true;
-        const ids: string[] = [];
+        let ids: string[] = [];
 
         try {
             for (const file of files) {
-                // Upload séquentiel pour garder l’état d’avancement simple
-                // (peut être parallélisé si besoin)
-                // eslint-disable-next-line no-await-in-loop
+                this.fileUploading = file;
                 await this.documentsService.uploadDocument(file).then((data) => {
                     ids.push(data._id);
                 });
-                this.fileUploading = file;
+                await Utils.delay(2000);
             }
+        } catch (err: any) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erreur lors de l\'envoi',
+                detail: err?.message || 'Une erreur est survenue lors de l\'envoi du fichier.',
+                life: 5000
+            });
+            return ids;
         } finally {
             this.fileUploading = null;
             this.isUploading = false;
@@ -157,12 +151,20 @@ export class DndFileComponent {
     private fileToBase64(file: File): Promise<Base64File> {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onerror = () => reject(reader.error);
+            reader.onerror = () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: `Erreur de lecture`,
+                    detail: file.name,
+                    life: 3000
+                });
+                reject(reader.error)
+            };
             reader.onload = () => {
                 const dataUrl = String(reader.result);
                 const base64 = dataUrl.split(',')[1] ?? '';
                 resolve({
-                    name: file.name,
+                    name: file.name || this.newFilename(file.type),
                     type: file.type,
                     size: file.size,
                     lastModified: file.lastModified,
@@ -172,6 +174,11 @@ export class DndFileComponent {
             };
             reader.readAsDataURL(file);
         });
+    }
+
+    private newFilename(type: string): string {
+        const ext = type.split('/').pop() ?? 'dat';
+        return `file_${new Date().getTime()}.${ext}`;
     }
 
     private splitAccepted(files: File[]): { accepted: File[]; refused: File[] } {

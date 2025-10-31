@@ -3,7 +3,15 @@
     grid-template-columns: 1fr 1fr;
     gap: var(--gap-l);
 
-    .extended {
+    &.mobile {
+        grid-template-columns: 1fr !important;
+    }
+
+    &:not(.mobile) .extended {
         grid-column: span 2;
+    }
+
+    app-table-forms {
+        overflow-x: auto;
     }
 }

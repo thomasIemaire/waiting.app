@@ -1,15 +1,16 @@
-import { Component, Input } from "@angular/core";
+import { Component, EventEmitter, inject, Input, Output } from "@angular/core";
 import { Form, FormsComponent } from "../../../../components/forms/forms.component";
+import { DeviceService } from "../../../../core/services/device.service";
 
 @Component({
     selector: 'app-preview-document-globals',
     imports: [FormsComponent],
     template: `
-    <div class="preview-document-globals__wrapper">
-        <app-forms [form]="documentForm" />
+    <div class="preview-document-globals__wrapper" [class.mobile]="!deviceService.isDesktopSize">
+        <app-forms [(form)]="documentForm" />
         <div></div>
-        <app-forms [form]="supplierForm" />
-        <app-forms [form]="customerForm" />
+        <app-forms [(form)]="supplierForm" />
+        <app-forms [(form)]="customerForm" />
     </div>
     `,
     styleUrls: ['./preview-document-globals.component.scss']
@@ -17,9 +18,13 @@ import { Form, FormsComponent } from "../../../../components/forms/forms.compone
 export class PreviewDocumentGlobalsComponent {
     @Input() data?: any;
 
+    @Output() dataChange = new EventEmitter<any>();
+
     public documentForm!: Form;
     public supplierForm!: Form;
     public customerForm!: Form;
+
+    public deviceService: DeviceService = inject(DeviceService);
 
     ngOnInit() {
         this.initForms();
@@ -29,6 +34,20 @@ export class PreviewDocumentGlobalsComponent {
         this.documentForm = this.getDocumentForm();
         this.supplierForm = this.getSupplierForm();
         this.customerForm = this.getCustomerForm();
+    }
+
+    onDocumentFormChange(f: Form) {
+        this.documentForm = f;
+        if (!this.data) return;
+
+        const name = f.items.find(i => i.label === 'Nom')?.value ?? '';
+        this.data.filename = name;
+
+        this.emitChange();
+    }
+
+    private emitChange() {
+        this.dataChange.emit({ ...this.data });
     }
 
     private initForms(): void {
