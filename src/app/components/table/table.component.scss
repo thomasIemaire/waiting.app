@@ -27,6 +27,15 @@
             height: 100%;
             flex: 1;
         }
+
+        .no-data__wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            color: var(--p-text-secondary-color);
+        }
     }
 }
 

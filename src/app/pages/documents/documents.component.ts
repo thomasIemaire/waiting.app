@@ -12,7 +12,8 @@ import { Router, RouterOutlet } from "@angular/router";
     template: `
     <p-toast />
     <div class="documents__wrapper">
-        <app-dnd-file label="document"
+        <app-dnd-file 
+            label="document"
             [acceptedFileTypes]="['.pdf', '.jpg', '.png']"
             (filesUploaded)="onFilesUploaded($event)"
             [autoUpload]="true"/>
@@ -26,6 +27,7 @@ export class DocumentsComponent {
     private router: Router = inject(Router);
 
     onFilesUploaded(ids: string[]): void {
-        this.router.navigate([`documents/${ids[0]}`]);
+        if (ids[0])
+            this.router.navigate([`documents/${ids[0]}`]);
     }
 }

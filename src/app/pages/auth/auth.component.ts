@@ -13,9 +13,9 @@ import { BrandComponent } from "../../components/brand/brand.component";
             </div>
         </div> -->
         <div class="auth__right-wrapper">
-            <div class="auth_brand">
+            <div class="auth__brand">
                 <app-brand size="large" />
-                <div class="auth_brand-text">
+                <div class="auth__brand-text">
                     <div>Compagnon de votre</div>
                     <div>Dématérialisation</div>
                 </div>

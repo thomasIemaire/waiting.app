@@ -11,19 +11,19 @@ export class ApiService {
 
     constructor(private http: HttpClient) { }
 
-    get<T>(endpoint: string, headers?: HttpHeaders): Observable<T> {
-        return this.http.get<T>(`${this.apiUrl}/${endpoint}`, { headers });
+    get<T>(endpoint: string, headers?: HttpHeaders, params?: any): Observable<T> {
+        return this.http.get<T>(`${this.apiUrl}/${endpoint}`, { headers, params });
     }
 
-    post<T>(endpoint: string, body: any, headers?: HttpHeaders): Observable<T> {
-        return this.http.post<T>(`${this.apiUrl}/${endpoint}`, body, { headers });
+    post<T>(endpoint: string, body: any, headers?: HttpHeaders, params?: any): Observable<T> {
+        return this.http.post<T>(`${this.apiUrl}/${endpoint}`, body, { headers, params });
     }
 
-    put<T>(endpoint: string, body: any, headers?: HttpHeaders): Observable<T> {
-        return this.http.put<T>(`${this.apiUrl}/${endpoint}`, body, { headers });
+    put<T>(endpoint: string, body: any, headers?: HttpHeaders, params?: any): Observable<T> {
+        return this.http.put<T>(`${this.apiUrl}/${endpoint}`, body, { headers, params });
     }
 
-    delete<T>(endpoint: string, headers?: HttpHeaders): Observable<T> {
-        return this.http.delete<T>(`${this.apiUrl}/${endpoint}`, { headers });
+    delete<T>(endpoint: string, headers?: HttpHeaders, params?: any): Observable<T> {
+        return this.http.delete<T>(`${this.apiUrl}/${endpoint}`, { headers, params });
     }
 }

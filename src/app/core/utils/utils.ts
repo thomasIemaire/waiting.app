@@ -9,4 +9,9 @@ export class Utils {
         }
         return text.slice(0, maxLength) + '...';
     }
+
+    static toCapitalize(text: string): string {
+        if (!text) return text;
+        return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    }
 }
