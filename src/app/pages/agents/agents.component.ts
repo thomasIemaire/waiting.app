@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { CommonModule } from '@angular/common';
 import { FormsModule } from "@angular/forms";
 
@@ -9,21 +9,32 @@ import { KanbanComponent } from "../../components/kanban/kanban.component";
 import { KanbanItem } from "../../components/kanban/kanban-item/kanban-item.component";
 import { Column } from "../../components/table/table.component";
 import { KanbanAgentItemComponent } from "../../components/kanban-agent-item/kanban-agent-item.component";
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from "@angular/router";
+
+import { filter, switchMap, of } from "rxjs";
+import { Utils } from "../../core/utils/utils";
 
 @Component({
   selector: 'app-agents',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastModule, KanbanComponent],
+  imports: [CommonModule, FormsModule, RouterOutlet, ToastModule, KanbanComponent],
   template: `
     <p-toast />
     <div class="agents__wrapper">
-      <app-kanban [items]="kanbanAgents" [cols]="kanbanAgentsCols" />
+      <app-kanban [items]="kanbanAgents" [cols]="kanbanAgentsCols" [activeItem]="activeKanbanItem" [isAnyTabActive]="isAnyTabActive">
+        <div class="agents__router-outlet" *ngIf="isAnyTabActive">
+          <router-outlet></router-outlet>
+        </div>
+      </app-kanban>
     </div>
   `,
   styleUrls: ['./agents.component.scss'],
   providers: [MessageService]
 })
 export class AgentsComponent {
+  private router: Router = inject(Router);
+  private route: ActivatedRoute = inject(ActivatedRoute);
+
   public kanbanAgents: KanbanItem[] = [
     {
       id: 'models',
@@ -33,8 +44,16 @@ export class AgentsComponent {
         {
           name: 'Prêts',
           endpoint: '/api/agents/models/in-progress',
-          add: true, component: KanbanAgentItemComponent,
-          draggable: true
+          component: KanbanAgentItemComponent,
+          draggable: true,
+          add: () => {
+            this.router.navigate([`/agents/${Utils.generateUUID()}`]);
+            this.setActiveTab([0]);
+          },
+          click: (item: KanbanItem) => {
+            this.router.navigate([`/agents/${item.id}`]);
+            this.setActiveTab([0]);
+          }
         },
       ]
     },
@@ -100,6 +119,37 @@ export class AgentsComponent {
       ]
     }
   ];
+
+  public readonly DEFAULT_ACTIVE_KANBAN_ITEM = [0, 1, 2, 3];
+  public activeKanbanItem!: number[];
+
+  ngOnInit(): void {
+    const child = this.route.firstChild;
+    const agentId = child?.snapshot.paramMap.get('id');
+
+    if (agentId) this.setActiveTab([0]);
+    else this.setActiveTab(this.DEFAULT_ACTIVE_KANBAN_ITEM);
+
+    this.router.events
+      .pipe(
+        filter(e => e instanceof NavigationEnd),
+        switchMap(() => this.route.firstChild ? this.route.firstChild.paramMap : of(null))
+      )
+      .subscribe(params => {
+        const agentId = params?.get('id');
+        if (agentId) this.setActiveTab([0]);
+        else this.setActiveTab(this.DEFAULT_ACTIVE_KANBAN_ITEM);
+      });
+  }
+
+  setActiveTab(index: number[]): void {
+    this.activeKanbanItem = index;
+  }
+
+  get isAnyTabActive(): boolean {
+    return !!this.activeKanbanItem
+      && this.activeKanbanItem.length !== this.DEFAULT_ACTIVE_KANBAN_ITEM.length;
+  }
 
   public kanbanAgentsCols: Column[] = [
     { field: 'nom', header: 'Nom' },

@@ -6,6 +6,7 @@ import { ApiService } from "../../../core/services/api.service";
 import { DynamicHostDirective } from "../../../core/directives/dynamic-host.directive";
 import { DragPayload, KanbanDragService } from "../../../core/services/kanban-drag.service";
 import { ContextMenuModule, ContextMenu } from 'primeng/contextmenu';
+import { Utils } from "../../../core/utils/utils";
 
 export interface KanbanItem {
     id: string;
@@ -21,9 +22,10 @@ interface KanbanItemDroppable {
 export interface KanbanSection {
     name: string;
     endpoint: string;
-    add?: boolean;
     draggable?: boolean;
     component: Type<any>;
+    add?: () => any | void;
+    click?: (item: KanbanItem) => any | void;
 }
 interface Column { field: string; header?: string; }
 
@@ -62,7 +64,7 @@ interface Column { field: string; header?: string; }
 
             <div class="kanban-board-item-section__add"
                  *ngIf="section.add"
-                 (click)="onAdd(section)">
+                 (click)="section.add()">
               <i class="pi pi-plus"></i>
             </div>
           </div>
@@ -72,6 +74,7 @@ interface Column { field: string; header?: string; }
                  *ngFor="let card of getDisplayed(section); let i = index; trackBy: trackByCard"
                  [class.is-draggable]="isCardDraggable(section, card)"
                  [attr.draggable]="isCardDraggable(section, card) ? true : null"
+                 (click)="section.click ? section.click(card) : null"
                  (dragstart)="onDragStart(section, card, i, $event)"
                  (dragend)="onDragEnd($event)"
                  (contextmenu)="onCardContextMenu($event, section, card)">
@@ -244,10 +247,11 @@ export class KanbanItemComponent implements OnInit {
         const ver = () => `v${1 + rand(3)}.${rand(10)}.${rand(10)}`;
         const isoWithinDays = (d: number) => new Date(Date.now() - rand(d) * 24 * 3600 * 1000).toISOString();
         return Array.from({ length: count }, (_, i) => {
+            const id = Utils.generateUUID();
             const thing = nouns[rand(nouns.length)];
             const stage = actions[rand(actions.length)];
             const name = `${section.name} — ${thing} ${i + 1}`;
-            return { name, reference: ref(), version: ver(), description: `Élément de démonstration (${stage}) pour « ${section.name} ».`, createdBy: people[rand(people.length)], createdAt: isoWithinDays(45) };
+            return { id, name, reference: ref(), version: ver(), description: `Élément de démonstration (${stage}) pour « ${section.name} ».`, createdBy: people[rand(people.length)], createdAt: isoWithinDays(45) };
         });
     }
 
