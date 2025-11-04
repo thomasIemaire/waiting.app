@@ -118,6 +118,8 @@ export class Mapper {
       const i = this.mapper.indexOf(node);
       if (i > -1) this.mapper.splice(i, 1);
       this.emitJson();
+    } else if ((node.label ?? '').trim() === '' && this.isRoot && this.isFirstNode(node)) {
+      node.children = [];
     }
   }
 

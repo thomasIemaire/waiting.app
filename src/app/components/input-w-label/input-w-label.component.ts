@@ -60,7 +60,7 @@ export interface FormItem {
         text
         severity="secondary"
         size="small"
-        icon="pi pi-sparkles"
+        icon="pi pi-question-circle"
         *ngIf="calculated"
         pTooltip="Valeur interprétée"
         tooltipPosition="left">
