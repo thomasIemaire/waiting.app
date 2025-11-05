@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input } from "@angular/core";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { InputTextModule } from 'primeng/inputtext';
 import { Column } from "../table/table.component";
@@ -34,7 +34,13 @@ export interface TableFormRow {
                     <tr *ngFor="let row of form.rows; let i = index">
                         <p-button variant="text" severity="secondary" size="small" [label]="(i + 1).toString()" />
                         <td *ngFor="let col of form.cols">
-                            <app-input-w-label [value]="row.items[col.field].value" [disabled]="row.items[col.field].disabled || false" [calculated]="row.items[col.field].calculated || false" />
+                            <app-input-w-label 
+                                [(value)]="row.items[col.field].value"
+                                [disabled]="row.items[col.field].disabled || false"
+                                [required]="row.items[col.field].required || false"
+                                [recommended]="row.items[col.field].recommended || false"
+                                [calculated]="row.items[col.field].calculated || false"
+                            />
                         </td>
                         <p-button variant="text" severity="danger" size="small" icon="pi pi-minus" (onClick)="removeLine(row)" pTooltip="Supprimer la ligne" tooltipPosition="left" />
                     </tr>
@@ -48,6 +54,8 @@ export interface TableFormRow {
 })
 export class TableFormsComponent {
     @Input({ required: true }) form!: TableForm;
+
+    @Output() formChange = new EventEmitter<TableForm>();
 
     public cols: Column[] = [];
 

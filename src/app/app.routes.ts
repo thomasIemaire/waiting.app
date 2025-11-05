@@ -1,28 +1,46 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guards';
+import { noAuthGuard } from './core/guards/no-auth.guard';
 
 export const routes: Routes = [
     {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'documents'
+    },
+    {
         path: 'auth',
-        loadChildren: () => import('./pages/auth/auth.route').then(m => m.authRoutes)
+        loadChildren: () => import('./pages/auth/auth.route').then(m => m.authRoutes),
+        canActivate: [noAuthGuard]
     },
     {
         path: 'documents',
-        loadChildren: () => import('./pages/documents/documents.route').then(m => m.documentsRoutes)
+        loadChildren: () => import('./pages/documents/documents.route').then(m => m.documentsRoutes),
+        canActivate: [authGuard]
     },
     {
         path: 'customers',
-        loadChildren: () => import('./pages/customers/customers.route').then(m => m.customersRoutes)
+        loadChildren: () => import('./pages/customers/customers.route').then(m => m.customersRoutes),
+        canActivate: [authGuard]
     },
     {
         path: 'suppliers',
-        loadChildren: () => import('./pages/suppliers/suppliers.route').then(m => m.suppliersRoutes)
+        loadChildren: () => import('./pages/suppliers/suppliers.route').then(m => m.suppliersRoutes),
+        canActivate: [authGuard]
     },
     {
         path: 'agents',
-        loadChildren: () => import('./pages/agents/agents.route').then(m => m.agentsRoutes)
+        loadChildren: () => import('./pages/agents/agents.route').then(m => m.agentsRoutes),
+        canActivate: [authGuard, adminGuard]
     },
     {
         path: 'flows',
-        loadChildren: () => import('./pages/flows/flows.route').then(m => m.flowsRoutes)
+        loadChildren: () => import('./pages/flows/flows.route').then(m => m.flowsRoutes),
+        canActivate: [authGuard, adminGuard]
+    },
+    {
+        path: '**',
+        redirectTo: 'documents'
     }
 ];

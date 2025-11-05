@@ -1,15 +1,16 @@
 <div class="table__container">
     <div class="table__wrapper">
         <div class="search__wrapper">
-            <input pInputText [(ngModel)]="search" type="text" pSize="small" [placeholder]="`Rechercher dans ${tableTitle.toLocaleLowerCase()}`"
-                (ngModelChange)="onSearchChange()" />
+            <input pInputText [(ngModel)]="search" type="text" pSize="small"
+                [placeholder]="`Rechercher dans ${tableTitle.toLocaleLowerCase()}`"
+                (ngModelChange)="onSearchChange()"  [disabled]="!data.length" />
             <p-multiselect [options]="cols" [(ngModel)]="searchOnlyCols" optionLabel="field" size="small"
                 placeholder="Rechercher sur les champs" [showHeader]="false" (ngModelChange)="onSearchChange()"
-                selectedItemsLabel="{0} champs sélectionnés" />
+                selectedItemsLabel="{0} champs sélectionnés" [disabled]="!data.length" />
         </div>
-        <p-table [value]="searchData" [paginator]="true" [rows]="20"
-            selectionMode="single" (selectionChange)="onSelectionChange($event)"
-            responsiveLayout="scroll">
+        @if (data.length) {
+        <p-table [value]="searchData" [paginator]="true" [rows]="20" selectionMode="single"
+            (selectionChange)="onSelectionChange($event)" responsiveLayout="scroll">
             <ng-template #caption>
                 <span class="table-title">{{ tableTitle }} · {{ data ? data.length : 0 }}</span>
             </ng-template>
@@ -31,5 +32,10 @@
             <ng-template #paginatorleft>
             </ng-template>
         </p-table>
+        } @else {
+        <div class="no-data__wrapper">
+            <span>Aucun résultat disponible</span>
+        </div>
+        }
     </div>
 </div>

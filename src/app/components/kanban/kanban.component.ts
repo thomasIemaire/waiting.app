@@ -48,16 +48,21 @@ export interface Column { field: string; header?: string; }
       </p-button>
     </div>
 
+
     <div class="kanban-board__wrapper">
-      <app-kanban-item
-        *ngFor="let item of items"
-        [item]="item"
-        [search]="search"
-        [searchOnlyCols]="searchOnlyCols"
-        [filterOnCol]="filterOnCol"
-        [sortOrder]="sortOrder"
-        (columnsFound)="onColumnsFound($event)">
-      </app-kanban-item>
+      <ng-container *ngFor="let item of items; let i = index">
+        <app-kanban-item
+          *ngIf="!isAnyTabActive || !activeItem || activeItem.includes(i)"
+          [item]="item"
+          [search]="search"
+          [searchOnlyCols]="searchOnlyCols"
+          [filterOnCol]="filterOnCol"
+          [sortOrder]="sortOrder"
+          (columnsFound)="onColumnsFound($event)">
+        </app-kanban-item>
+      </ng-container>
+
+      <ng-content *ngIf="isAnyTabActive"></ng-content>
     </div>
   </div>
   `,
@@ -66,6 +71,8 @@ export interface Column { field: string; header?: string; }
 export class KanbanComponent {
     @Input({ required: true }) public items!: KanbanItem[];
     @Input({ required: true }) public cols!: Column[];
+    @Input() public activeItem?: number[];
+    @Input() public isAnyTabActive?: boolean;
 
     public search = '';
     public searchOnlyCols: Column[] = [];
@@ -75,6 +82,10 @@ export class KanbanComponent {
     ngOnInit() {
         this.searchOnlyCols = [...this.cols];
         this.filterOnCol = this.cols.length ? this.cols[0].field : '';
+    }
+
+    ngOnChanges() {
+      this.activeItem = [...this.activeItem ?? Array.from(this.items.keys())];
     }
 
     onColumnsFound(fields: string[]) {

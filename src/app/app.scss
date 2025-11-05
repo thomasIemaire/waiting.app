@@ -30,6 +30,11 @@
                     flex: 1;
                     height: 100%;
                 }
+                
+                &.mobile {
+                    app-brand { flex: 1; }
+                    app-header { flex: none; width: auto; }
+                }
             }
         }
 
@@ -39,7 +44,7 @@
             flex: 1;
 
             .content__wrapper {
-                gap: calc(var(--gap-l) / 2);
+                gap: var(--gap-l);
 
                 app-sidebar {
                     width: var(--width-static-sidebar);
@@ -60,12 +65,17 @@
 }
 
 ::ng-deep {
-    .content__wrapper {
-        >*:not(app-sidebar, router-outlet) {
+    .content__wrapper .content__router-outlet {
+        overflow-y: auto;
+        overflow-x: hidden;
+        height: 100%;
+        flex: 1;
+
+        >*:not(router-outlet) {
             overflow-y: auto;
             overflow-x: hidden;
             height: 100%;
-            flex: 1;
+            width: 100%;
         }
     }
 }

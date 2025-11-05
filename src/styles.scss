@@ -34,8 +34,6 @@
     --radius-m: calc(var(--gmp-static-m) / 2);
     --radius-l: calc(var(--gmp-static-l) / 2);
     --radius-xl: calc(var(--gmp-static-xl) / 2);
-
-    
 }
 
 :root {
@@ -120,12 +118,12 @@ body {
     }
 }
 
-.p-datatable-tbody > tr > td {
+.p-datatable-tbody>tr>td {
     font-size: .75rem !important;
     padding: .5rem .75rem !important;
 }
 
-.p-datatable-thead > tr > th,
+.p-datatable-thead>tr>th,
 .p-datatable-sort-icon,
 .p-datatable-sort-badge {
     font-size: .875rem !important;
@@ -159,4 +157,51 @@ p-breadcrumb .p-breadcrumb {
 
 .p-password-fluid {
     width: 100%;
+}
+
+.p-progressspinner-spin {
+    width: 2rem !important;
+    height: 2rem !important;
+
+    circle {
+        stroke: var(--p-text-color) !important;
+    }
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.font-medium {
+    font-size: .875rem;
+    font-weight: 500;
+}
+
+.bold {
+    font-weight: 600;
+}
+
+app-input-w-label {
+    width: 100%;
+}
+
+.form__wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-m);
+
+    .form__inputs-group {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: var(--gap-m);
+    }
 }
