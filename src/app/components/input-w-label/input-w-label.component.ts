@@ -5,6 +5,9 @@ import { ButtonModule } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
 import { Tooltip } from "primeng/tooltip";
 import { PasswordModule } from "primeng/password";
+import { AutoFocusModule } from 'primeng/autofocus';
+import { InputMaskModule } from 'primeng/inputmask';
+import { KeyFilterModule, KeyFilterPattern } from 'primeng/keyfilter';
 
 export interface FormItem {
   type?: string;
@@ -14,15 +17,17 @@ export interface FormItem {
   recommended?: boolean;
   disabled?: boolean;
   calculated?: boolean;
+  autofocus?: boolean;
+  mask?: RegExp | KeyFilterPattern | null;
 }
 
 @Component({
   selector: "app-input-w-label",
-  imports: [CommonModule, FormsModule, InputTextModule, Tooltip, ButtonModule, PasswordModule],
+  imports: [CommonModule, FormsModule, InputTextModule, Tooltip, ButtonModule, PasswordModule, AutoFocusModule, InputMaskModule, KeyFilterModule],
   standalone: true,
   template: `
-    <div class="input-w-label__item-label">
-      {{ label }}<span *ngIf="required" class="required-indicator">*</span>
+    <div class="input-label">
+      <div>{{ label }}<span *ngIf="required" class="required-indicator">*</span></div>
     </div>
 
     <div class="input-w-label__item-input">
@@ -38,6 +43,8 @@ export interface FormItem {
             [disabled]="disabled"
             [placeholder]="label ? label : ''"
             [toggleMask]="true"
+            [style.border]="borderStyle"
+            [pAutoFocus]="autofocus"
           />
         }
         @default {
@@ -52,6 +59,8 @@ export interface FormItem {
             [disabled]="disabled"
             [placeholder]="label ? label : ''"
             [style.border]="borderStyle"
+            [pAutoFocus]="autofocus"
+            [pKeyFilter]="mask"
           />
         }
       }
@@ -68,7 +77,6 @@ export interface FormItem {
     </div>
   `,
   styles: [`
-    .input-w-label__item-label { font-size: 0.75rem; }
     .input-w-label__item-input { display: flex; align-items: center; gap: var(--gap-s); }
   `]
 })
@@ -80,6 +88,8 @@ export class InputWLabelComponent {
   @Input() recommended: boolean = false;
   @Input() disabled: boolean = false;
   @Input() calculated: boolean = false;
+  @Input() autofocus: boolean = false;
+  @Input() mask: RegExp | KeyFilterPattern | null = null;
 
   @Output() valueChange = new EventEmitter<any>();
   @Output() blur = new EventEmitter<any>();

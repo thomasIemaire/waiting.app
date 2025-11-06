@@ -366,7 +366,7 @@ export const defaultTheme = definePreset(Aura, {
                 padding: "0.5rem 1rem 0.25rem 1rem"
             },
             option: {
-                padding: "0.5rem 0.75rem",
+                padding: "0.25rem 0.5rem",
                 borderRadius: "{border.radius.sm}"
             },
             optionGroup: {

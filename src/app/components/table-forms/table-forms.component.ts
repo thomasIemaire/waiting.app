@@ -27,7 +27,7 @@ export interface TableFormRow {
             <table class="table-forms__table">
                 <thead>
                     <tr>
-                        <td class="table-header__label" *ngFor="let col of cols">{{ col.header }}</td>
+                        <td class="input-label" style="display: table-cell !important;" *ngFor="let col of cols">{{ col.header }}</td>
                     </tr>
                 </thead>
                 <tbody>

@@ -51,6 +51,9 @@ function buildJson(nodes: Node[]): JsonObj {
   providers: [MessageService]
 })
 export class Mapper {
+  @Input() label: string = 'Schéma';
+  @Input() required: boolean = false;
+  
   @Input() root: string = 'root';
 
   private rootNode: Node = new Node(null, '', [], this.root);
@@ -74,8 +77,12 @@ export class Mapper {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['root'] && this.isRoot) this.rootNode = new Node(null, '', [], this.root);
+    if (changes['root'])
+      this.mapper.forEach(node => {
+        if (node.parent === null) node.root = this.root;
+      });
       this.reloadJson();
+      this.emitJson();
   }
 
   private reloadJson() {
@@ -101,7 +108,11 @@ export class Mapper {
   }
 
   public addNode(parent: Node | null): void {
-    this.mapper.push(new Node(parent));
+    const node = new Node(parent);
+    this.mapper.push(node);
+    if (parent === null) {
+      node.root = this.root;
+    }
   }
 
   public addChild(node: Node): void {
@@ -147,7 +158,7 @@ export class Mapper {
         }
       }
     };
-    traverse(this.mapper);
+    traverse(this.mapper);    
     return keys;
   }
 

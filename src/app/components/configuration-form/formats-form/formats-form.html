@@ -1,0 +1,25 @@
+<div class="formats-form__wrapper">
+    <div class="form__wrapper">
+        <div class="form__inputs-group">
+
+            <input pInputText [(ngModel)]="format" (blur)="onFormatChange(); edit = false" [pAutoFocus]="true"
+                type="text" placeholder="Format" pSize="small" *ngIf="edit" fluid />
+
+            <div class="format-token" *ngIf="!edit" (click)="edit = true">
+                <ng-container *ngIf="format; else emptyFormat">
+                    <ng-container *ngFor="let t of tokens">
+                        <span *ngIf="t.key; else plain" class="entity-in-example" [pTooltip]="t.key"
+                            tooltipPosition="top">
+                            {{ t.text }}
+                        </span>
+                        <ng-template #plain>{{ t.text }}</ng-template>
+                    </ng-container>
+                </ng-container>
+                <ng-template #emptyFormat>Aucun format</ng-template>
+            </div>
+
+            <p-button icon="pi pi-minus" variant="text" severity="danger" size="small" pTooltip="Supprimer le format"
+                tooltipPosition="left" (click)="remove.emit()"></p-button>
+        </div>
+    </div>
+</div>

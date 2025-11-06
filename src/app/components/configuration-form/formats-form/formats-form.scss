@@ -1,0 +1,31 @@
+.format-token {
+    width: 100%;
+    font-size: var(--p-inputtext-sm-font-size);
+    padding-block: var(--p-inputtext-sm-padding-y);
+    padding-inline: var(--p-inputtext-sm-padding-x);
+    font-family: inherit;
+    font-feature-settings: inherit;
+    color: var(--p-inputtext-color);
+    background: var(--p-inputtext-background);
+    border: 1px solid var(--p-inputtext-border-color);
+    transition: background var(--p-inputtext-transition-duration), color var(--p-inputtext-transition-duration), border-color var(--p-inputtext-transition-duration), outline-color var(--p-inputtext-transition-duration), box-shadow var(--p-inputtext-transition-duration);
+    appearance: none;
+    border-radius: var(--p-inputtext-border-radius);
+    outline-color: transparent;
+    box-shadow: var(--p-inputtext-shadow);
+    cursor: text;
+
+    &:hover {
+        border-color: var(--p-inputtext-hover-border-color);
+    }
+}
+
+.entity-in-example {
+    background-color: var(--background-color-200);
+    border: 1px solid var(--background-color-300);
+    padding: .025rem .4rem;
+    border-radius: .3rem;
+    font-size: .625rem;
+    font-weight: 600;
+    cursor: pointer;
+}

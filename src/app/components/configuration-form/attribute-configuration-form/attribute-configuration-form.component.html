@@ -1,0 +1,104 @@
+<div class="attribute-configuration-form__wrapper">
+    <div class="form__inputs-group flex">
+        <div class="input-w-label flex">
+            <div class="input-label" *ngIf="first">
+                Clé de l'attribut
+                <i class="pi pi-info-circle" pTooltip='Pour une clé personnalisée ne pas utiliser "_"'
+                    tooltipPosition="right"></i>
+            </div>
+            <p-select [options]="keys" [(ngModel)]="attribute.key" size="small"
+                placeholder="Selectionner une clé d'attribut" [editable]="true" fluid optionLabel="value"
+                optionValue="value" appendTo="body" />
+        </div>
+        <div class="input-w-label width-128">
+            <div class="input-label" *ngIf="first">Type</div>
+            <p-select [options]="types" [(ngModel)]="attribute.value.type" size="small"
+                placeholder="Selectionner un type" fluid optionValue="value" optionLabel="label" appendTo="body" />
+        </div>
+    </div>
+    <div class="form__inputs-group flex attribute-rule__wrapper">
+        <div class="input-w-label width-128">
+            <div class="input-label" *ngIf="first">Règle</div>
+            <p-select [options]="rules" [(ngModel)]="attribute.value.rule" size="small"
+                placeholder="Selectionner une règle" optionValue="value" optionLabel="label" appendTo="body" />
+        </div>
+        <div class="input-w-label flex">
+            <div class="input-label" *ngIf="first">Paramètres</div>
+            @switch (attribute.value.rule) {
+            @default {
+            <div class="flex align-center gap-s">
+                <p-select [options]="types" [(ngModel)]="attribute.value.parameters.regex" size="small"
+                    placeholder="Selectionner une configuration" fluid appendTo="body">
+                    <ng-template let-option pTemplate="item">
+                        <div class="flex align-center gap-s space-between w-100">
+                            <span class="item-label">{{ option.label }}</span>
+                            <p-button icon="pi pi-minus" text severity="danger" size="small"
+                                [style]="{ 'padding': '0' }" (click)="$event.stopPropagation();"
+                                (mousedown)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
+                                (keydown.space)="$event.stopPropagation()" />
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="footer">
+                        <p-button class="flex justify-center w-100" label="Nouveau" severity="secondary" text
+                            size="small" icon="pi pi-plus" flex />
+                    </ng-template>
+                </p-select>
+                <p-button icon="pi pi-eye" severity="secondary" text size="small" pTooltip="Ouvrir la configuration"
+                    tooltipPosition="left" appendTo="body" />
+            </div>
+            }
+            @case ('data') {
+            <div class="flex align-center gap-s">
+                <p-select [options]="types" [(ngModel)]="attribute.value.parameters.regex" size="small"
+                    placeholder="Selectionner une liste de données" fluid appendTo="body">
+                    <ng-template let-option pTemplate="item">
+                        <div class="flex align-center gap-s space-between w-100">
+                            <span class="item-label">{{ option.label }}</span>
+                            <p-button icon="pi pi-minus" text severity="danger" size="small"
+                                [style]="{ 'padding': '0' }" (click)="$event.stopPropagation();"
+                                (mousedown)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
+                                (keydown.space)="$event.stopPropagation()" />
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="footer">
+                        <p-button class="flex justify-center w-100" label="Nouveau" severity="secondary" text
+                            size="small" icon="pi pi-plus" flex />
+                    </ng-template>
+                </p-select>
+                <p-button icon="pi pi-eye" severity="secondary" text size="small" pTooltip="Ouvrir la liste de données"
+                    tooltipPosition="left" appendTo="body" />
+            </div>
+            }
+            @case ('randint') {
+            <div class="flex gap-s">
+                <input pInputText [(ngModel)]="attribute.value.parameters.min" type="text" pSize="small" fluid
+                    placeholder="Min" />
+                <input pInputText [(ngModel)]="attribute.value.parameters.max" type="text" pSize="small" fluid
+                    placeholder="Max" />
+            </div>
+            }
+            @case ('alphanum') {
+            <input pInputText [(ngModel)]="attribute.value.parameters.regex" type="text" pSize="small" fluid
+                placeholder="Expression régulière" />
+            }
+            }
+        </div>
+    </div>
+    <div class="form__inputs-group">
+        <div class="input-w-label width-128">
+            <div class="input-label" *ngIf="first">Obligations</div>
+            <p-select [options]="keys" [(ngModel)]="attribute.name" size="small"
+                placeholder="Selectionner une clé d'attribut" [editable]="true" fluid optionLabel="value"
+                optionValue="value" appendTo="body" />
+        </div>
+        <div class="input-w-label">
+            <div class="input-label" *ngIf="first">Fréquence</div>
+            <div style="display: flex; align-items: center; gap: var(--gap-m);">
+                <input pInputText [(ngModel)]="attribute.frequency" type="text" pSize="small" fluid class="width-48"
+                    [pKeyFilter]="frequencyPattern" />
+                <p-button icon="pi pi-minus" severity="danger" size="small" pTooltip="Supprimer l'attribut"
+                    tooltipPosition="left" text (click)="remove.emit()"></p-button>
+            </div>
+        </div>
+    </div>
+</div>

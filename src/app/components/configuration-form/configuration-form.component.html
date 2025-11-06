@@ -1,0 +1,19 @@
+<div class="configuration-form__wrapper">
+    <div class="form__wrapper">
+        <app-input-w-label label="Nom" [(value)]="configuration.name" [required]="true"></app-input-w-label>
+        <app-input-w-label label="Description" [(value)]="configuration.description"
+            [recommended]="true"></app-input-w-label>
+        <div>
+            <app-attribute-configuration-form [keys]="keys" [attribute]="attribute" [first]="i === 0"
+                *ngFor="let attribute of configuration.attributes; let i = index" (remove)="removeAttribute(i)" />
+            <p-button label="Ajouter un attribut" icon="pi pi-plus" severity="secondary" size="small" text
+                (click)="addAttribute()" />
+        </div>
+        <div class="form__wrapper">
+            <app-formats-form [keys]="keys" [format]="format" [first]="i === 0"
+                *ngFor="let format of configuration.formats; let i = index" (remove)="removeFormat(i)" />
+            <p-button label="Ajouter un format" icon="pi pi-plus" text severity="secondary" size="small" text
+                (click)="addFormat()"></p-button>
+        </div>
+    </div>
+</div>
