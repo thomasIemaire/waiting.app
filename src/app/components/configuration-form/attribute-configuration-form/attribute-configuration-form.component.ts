@@ -6,10 +6,11 @@ import { InputTextModule } from "primeng/inputtext";
 import { Button } from "primeng/button";
 import { Tooltip } from "primeng/tooltip";
 import { KeyFilter } from "primeng/keyfilter";
+import { MultiSelectModule } from 'primeng/multiselect';
 
 @Component({
     selector: 'app-attribute-configuration-form',
-    imports: [CommonModule, FormsModule, SelectModule, InputTextModule, Button, Tooltip, KeyFilter],
+    imports: [CommonModule, FormsModule, SelectModule, InputTextModule, Button, Tooltip, KeyFilter, MultiSelectModule],
     templateUrl: './attribute-configuration-form.component.html',
     styleUrls: ['./attribute-configuration-form.component.scss']
 })
@@ -21,11 +22,7 @@ export class AttributeConfigurationFormComponent {
     public keys: any[] = [];
 
     @Input()
-    public attribute: any = {
-        name: '',
-        type: '',
-        frequency: 1
-    };
+    public attribute: any = {};
 
     @Output()
     public remove: EventEmitter<void> = new EventEmitter<void>();
@@ -42,7 +39,7 @@ export class AttributeConfigurationFormComponent {
     public rules: any[] = [
         { label: 'Configuration', value: 'configuration' },
         { label: 'Entier aléatoire', value: 'randint' },
-        { label: 'Expression régulière', value: 'alphanum' },
+        { label: 'Expression régulière', value: 'alphanumeric' },
         { label: 'Liste de données', value: 'data' }
     ];
 
@@ -52,15 +49,15 @@ export class AttributeConfigurationFormComponent {
         if (changes['keys']) {
             this.keys.forEach(key => {
                 const root = key.value.split('_')[0];
-                if (root) this.setRootForKey(root);
+                this.setRootForKey(root);
             });
         }
     }
 
     private setRootForKey(root: string): void {
-        if (!this.attribute.name.includes('_')) return;
-        let attributeNameList = this.attribute.name.split('_');
-        attributeNameList[0] = root;
-        this.attribute.name = attributeNameList.join('_');
+        if (!this.attribute.key.includes('_')) return;
+        let attributeKeyList = this.attribute.key.split('_');
+        attributeKeyList[0] = root;
+        this.attribute.key = attributeKeyList.join('_');
     }
 }

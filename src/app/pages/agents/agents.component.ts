@@ -40,10 +40,11 @@ export class AgentsComponent {
       id: 'models',
       name: 'Modèles',
       copyOnExternalDrop: true,
+      onRemoveEndpoint: '/api/models/{id}',
       sections: [
         {
           name: 'Prêts',
-          endpoint: '/api/agents/models/in-progress',
+          endpoint: '/api/models/status/ready',
           component: KanbanAgentItemComponent,
           draggable: true,
           add: () => {
@@ -60,6 +61,7 @@ export class AgentsComponent {
     {
       id: 'datasets',
       name: 'Datasets',
+      onRemoveEndpoint: '/api/datasets/{id}',
       dropable: {
         enabled: true,
         acceptedFrom: ['models']
@@ -67,20 +69,21 @@ export class AgentsComponent {
       sections: [
         {
           name: 'A valider',
-          endpoint: '/api/agents/prepared/to-prepare',
+          endpoint: '/api/datasets/status/to-validate',
           component: KanbanAgentItemComponent
         },
         {
           name: 'En cours',
-          endpoint: '/api/agents/prepared/in-progress',
+          endpoint: '/api/datasets/status/in-build',
           component: KanbanAgentItemComponent,
           draggable: false
         },
         {
           name: 'En attente',
-          endpoint: '/api/agents/prepared/to-train',
+          endpoint: '/api/datasets/status/to-build',
           component: KanbanAgentItemComponent,
-          draggable: false
+          draggable: false,
+          onAddEndpoint: '/api/models/build/{id}'
         },
       ]
     },
@@ -94,13 +97,13 @@ export class AgentsComponent {
       sections: [
         {
           name: 'En cours',
-          endpoint: '/api/agents/trains/in-progress',
+          endpoint: '/api/datasets/status/in-train',
           component: KanbanAgentItemComponent,
           draggable: false
         },
         {
           name: 'En attente',
-          endpoint: '/api/agents/trains/to-deploy',
+          endpoint: '/api/datasets/status/to-train',
           component: KanbanAgentItemComponent,
           draggable: false
         },
@@ -112,7 +115,7 @@ export class AgentsComponent {
       sections: [
         {
           name: 'Déployés',
-          endpoint: '/api/agents/deployed/active',
+          endpoint: '/api/agents',
           component: KanbanAgentItemComponent,
           draggable: false
         },

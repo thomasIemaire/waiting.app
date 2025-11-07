@@ -68,7 +68,7 @@ export class Mapper {
 
   @Output() keysChange = new EventEmitter<string[]>();
 
-  labelRegex: RegExp = /^[a-z-]+$/;
+  labelRegex: RegExp = /^[a-z_]+$/;
 
   private messageService: MessageService = inject(MessageService);
 
@@ -82,7 +82,6 @@ export class Mapper {
         if (node.parent === null) node.root = this.root;
       });
       this.reloadJson();
-      this.emitJson();
   }
 
   private reloadJson() {

@@ -20,4 +20,21 @@ export class Utils {
     static generateUUID(): string {
         return uuidv4().replace(/-/g, '');
     }
+
+    static _id2id(object: any): any {
+        if (Array.isArray(object)) {
+            return object.map(item => this._id2id(item));
+        } else if (object !== null && typeof object === 'object') {
+            const newObj: any = {};
+            for (const key in object) {
+                if (key === '_id') {
+                    newObj['id'] = object[key];
+                } else {
+                    newObj[key] = this._id2id(object[key]);
+                }
+            }
+            return newObj;
+        }
+        return object;
+    }
 }

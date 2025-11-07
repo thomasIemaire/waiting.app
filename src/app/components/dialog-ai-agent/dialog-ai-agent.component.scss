@@ -1,0 +1,17 @@
+.dialog-ai-agent__wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+
+    .dialog-ai-agent__modes-wrapper {
+        display: flex;
+        gap: var(--gap-l);
+
+        .ai-agent-mode__wrapper {
+            display: flex;
+            align-items: center;
+            gap: var(--gap-s);
+            font-size: .75rem;
+        }
+    }
+}

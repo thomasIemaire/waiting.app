@@ -1,0 +1,42 @@
+<div class="preview-agent__container">
+    <div class="preview-agent__wrapper">
+        <div class="preview-agent__model-wrapper">
+            <div class="model-wrapper__header">
+                <div class="model-wrapper__header-leftside">
+                    <p-button icon="pi pi-arrow-left" text label="Retour" severity="secondary" size="small"
+                        (click)="goBack()"></p-button>
+                    <span class="model-wrapper__header-name">{{ model.name}}</span>
+                </div>
+                <div class="model-wrapper__header-rightside">
+                    <p-button icon="pi pi-sparkles" label="Demander de l'aide" text severity="secondary" size="small"
+                        (click)="askForHelp()"></p-button>
+                </div>
+            </div>
+            <div class="model-wrapper__content">
+                <div class="form__wrapper--model">
+                    <div class="form__inputs-group">
+                        <app-input-w-label label="Nom" [(value)]="model.name" [required]="true"></app-input-w-label>
+                        <app-input-w-label label="Référence" [(value)]="model.reference" [required]="true"
+                            [mask]="referenceRegex"></app-input-w-label>
+                    </div>
+                    <app-input-w-label label="Description" [(value)]="model.description"
+                        [recommended]="true"></app-input-w-label>
+                    <app-mapper label="Schéma retour" [required]="true" [root]="model.reference" [isRoot]="true"
+                        (keysChange)="keys = $event" [(json)]="model.mapper" />
+                </div>
+                <div class="form__wrapper--configuration">
+                    <div class="configuration-form__header">
+                        <div>Configuration</div>
+                        <div class="configuration-form__header-name">{{ configuration.name }}</div>
+                    </div>
+                    <app-configuration-form [keys]="keys" [configuration]="configuration" />
+                </div>
+            </div>
+            <div class="model-wrapper__footer flex gap-s justify-end">
+                <p-button label="Annuler" text severity="secondary" size="small" (click)="goBack()" />
+                <p-button label="Exporter" text severity="primary" size="small" />
+                <p-button label="Enregistrer" severity="primary" size="small" (click)="save()"/>
+            </div>
+        </div>
+    </div>
+</div>

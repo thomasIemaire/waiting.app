@@ -12,8 +12,10 @@
         <div class="form__wrapper">
             <app-formats-form [keys]="keys" [format]="format" [first]="i === 0"
                 *ngFor="let format of configuration.formats; let i = index" (remove)="removeFormat(i)" />
-            <p-button label="Ajouter un format" icon="pi pi-plus" text severity="secondary" size="small" text
-                (click)="addFormat()"></p-button>
+            <div>
+                <p-button label="Ajouter un format" icon="pi pi-plus" text severity="secondary" size="small" text
+                    (click)="addFormat()" />
+            </div>
         </div>
     </div>
 </div>

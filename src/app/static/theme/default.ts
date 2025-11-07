@@ -1,6 +1,8 @@
 import { definePreset } from "@primeuix/themes";
 import Aura from '@primeuix/themes/aura';
 
+import { toggleswitch } from "./toggle-switch";
+
 export const defaultTheme = definePreset(Aura, {
     primitive: {
         borderRadius: {
@@ -725,5 +727,8 @@ export const defaultTheme = definePreset(Aura, {
                 }
             }
         }
+    },
+    components: {
+        toggleswitch
     }
 });

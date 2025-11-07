@@ -14,6 +14,8 @@ export interface KanbanItem {
     sections: KanbanSection[];
     dropable?: KanbanItemDroppable;
     copyOnExternalDrop?: boolean;
+    onAddEndpoint?: string;
+    onRemoveEndpoint?: string;
 }
 interface KanbanItemDroppable {
     enabled: boolean;
@@ -22,6 +24,8 @@ interface KanbanItemDroppable {
 export interface KanbanSection {
     name: string;
     endpoint: string;
+    onAddEndpoint?: string;
+    onRemoveEndpoint?: string;
     draggable?: boolean;
     component: Type<any>;
     add?: () => any | void;
@@ -145,6 +149,7 @@ export class KanbanItemComponent implements OnInit {
 
         this.api.get<any[]>(ep).subscribe({
             next: (rows) => {
+                rows = Utils._id2id(rows);
                 const arr = Array.isArray(rows) ? rows : rows ? [rows] : [];
                 this.data[section.name] = arr;
                 this.loading[section.name] = false;
@@ -159,14 +164,11 @@ export class KanbanItemComponent implements OnInit {
                 if (fields.size) this.columnsFound.emit(Array.from(fields));
             },
             error: (err) => {
-                const fallback = this.buildFallbackItems(section, 1);
-                this.data[section.name] = fallback;
                 this.loading[section.name] = false;
-                this.columnsFound.emit(Object.keys(fallback[0] || {}));
                 this.messages.add({
                     severity: 'warn',
                     summary: `API indisponible — ${this.item.name} / ${section.name}`,
-                    detail: `${err?.error?.message || err?.message || 'Requête échouée'}. ${fallback.length} éléments fictifs générés pour l’affichage.`
+                    detail: `${err?.error?.message || err?.message || 'Requête échouée'}.`
                 });
             }
         });
@@ -232,26 +234,6 @@ export class KanbanItemComponent implements OnInit {
             severity: 'info',
             summary: 'Ajouter',
             detail: `Action d’ajout sur « ${this.item.name} / ${section.name} » (à implémenter).`
-        });
-    }
-
-    // -------- Fallback (mock) ----------
-    private buildFallbackItems(section: KanbanSection, count = 8): Array<{
-        name: string; reference: string; version: string; description: string; createdBy: string; createdAt: string;
-    }> {
-        const people = ['Alice', 'Benoît', 'Chloé', 'David', 'Élise', 'Félix', 'Gaëlle', 'Hugo'];
-        const nouns = ['modèle', 'jeu de données', 'pipeline', 'service', 'module', 'connecteur'];
-        const actions = ['prototype', 'bêta', 'stable', 'expérimental', 'snapshot'];
-        const rand = (n: number) => Math.floor(Math.random() * n);
-        const ref = () => `R-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-        const ver = () => `v${1 + rand(3)}.${rand(10)}.${rand(10)}`;
-        const isoWithinDays = (d: number) => new Date(Date.now() - rand(d) * 24 * 3600 * 1000).toISOString();
-        return Array.from({ length: count }, (_, i) => {
-            const id = Utils.generateUUID();
-            const thing = nouns[rand(nouns.length)];
-            const stage = actions[rand(actions.length)];
-            const name = `${section.name} — ${thing} ${i + 1}`;
-            return { id, name, reference: ref(), version: ver(), description: `Élément de démonstration (${stage}) pour « ${section.name} ».`, createdBy: people[rand(people.length)], createdAt: isoWithinDays(45) };
         });
     }
 
@@ -348,11 +330,27 @@ export class KanbanItemComponent implements OnInit {
             try { p.removeFromSource(); } catch { }
         }
 
-        this.messages.add({
-            severity: 'success',
-            summary: p.copyOnExternalDrop ? 'Élément copié' : 'Élément déplacé',
-            detail: `${p.copyOnExternalDrop ? 'Copié' : 'Déplacé'} vers « ${this.item.name} / ${target.name} ».`
-        });
+        // Si un endpoint d’ajout est défini, on l’appelle
+        const addEp = target.onAddEndpoint || this.item.onAddEndpoint;
+        if (addEp) {
+            const ep = this.normalizeEndpoint(addEp.replace('{id}', recToAdd.id || ''));
+            this.api.post(ep, {}).subscribe({
+                next: () => {
+                    this.messages.add({
+                        severity: 'success',
+                        summary: 'Élément ajouté',
+                        detail: `L’élément a été ajouté avec succès à « ${this.item.name} / ${target.name} ».`
+                    });
+                },
+                error: (err) => {
+                    this.messages.add({
+                        severity: 'error',
+                        summary: 'Erreur lors de l’ajout',
+                        detail: `Impossible d’ajouter l’élément à « ${this.item.name} / ${target.name} » : ${err.message}`
+                    });
+                }
+            });
+        }
     }
 
     onDragStart(section: KanbanSection, card: any, _index: number, ev: DragEvent) {
@@ -405,10 +403,17 @@ export class KanbanItemComponent implements OnInit {
         const arr = this.data[section.name] || [];
         if (index >= 0 && index < arr.length) arr.splice(index, 1);
     }
+
     private removeCardByRecord(section: KanbanSection, record: any) {
         const arr = this.data[section.name] || [];
         const idx = arr.findIndex(x => x === record || (x?.id && record?.id && x.id === record.id));
         if (idx >= 0) arr.splice(idx, 1);
+
+        const removeEp = section.onRemoveEndpoint || this.item.onRemoveEndpoint;
+        if (removeEp) {
+            const ep = this.normalizeEndpoint(removeEp.replace('{id}', record.id || ''));
+            this.api.delete(ep).subscribe();
+        }
     }
     private addCard(section: KanbanSection, record: any) {
         const arr = this.data[section.name] || (this.data[section.name] = []);

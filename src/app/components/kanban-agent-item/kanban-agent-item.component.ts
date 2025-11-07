@@ -1,7 +1,8 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input } from "@angular/core";
+import { Component, inject, Input } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { TagModule } from 'primeng/tag';
+import { UserService } from "../../core/services/user.service";
 
 @Component({
     selector: 'app-kanban-agent-item',
@@ -23,14 +24,14 @@ import { TagModule } from 'primeng/tag';
             </div>
         </div>
         <div class="kanban-agent-item__footer">
-            <div class="kanban-agent-item__footer-avatar">
+            <div class="kanban-agent-item__footer-avatar" [style.backgroundImage]="'url(' + userService.getAvatarUrl(data.created_by.id!) + ')'">
             </div>
             <div class="kanban-agent-item__footer-info">
                 <div class="kanban-agent-item__footer-user">
-                    Créé par {{data.createdBy}}
+                    Créé par <div class="user-name">{{data.created_by.firstname}} {{data.created_by.lastname}}</div>
                 </div>
                 <div class="kanban-agent-item__footer-date">
-                    Le {{data.createdAt | date:'short'}}
+                    Le {{data.created_at | date:'short'}}
                 </div>
             </div>
         </div>
@@ -39,5 +40,7 @@ import { TagModule } from 'primeng/tag';
     styleUrls: ['./kanban-agent-item.component.scss']
 })
 export class KanbanAgentItemComponent {
+    public userService: UserService = inject(UserService);
+
     @Input() data: any;
 }

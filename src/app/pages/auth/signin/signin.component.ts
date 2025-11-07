@@ -50,6 +50,23 @@ export class SigninComponent {
 
     public messages: { severity: 'success' | 'info' | 'warn' | 'error'; detail: string }[] = [];
 
+    private handleKeydown = async (event: KeyboardEvent) => {
+        if (event.key !== 'Enter') {
+            return;
+        }
+
+        event.preventDefault();
+        this.onSubmit();
+    };
+
+    ngOnInit() {
+        document.addEventListener('keydown', this.handleKeydown);
+    }
+
+    ngOnDestroy() {
+        document.removeEventListener('keydown', this.handleKeydown);
+    }
+
     public goToRegister(): void {
         this.router.navigate(['/auth/register']);
     }
@@ -58,7 +75,7 @@ export class SigninComponent {
         this.messages = [];
 
         const email = this.formSignin.items[0].value?.trim() ?? '';
-        const password = this.formSignin.items[1].value ?? '';        
+        const password = this.formSignin.items[1].value ?? '';
 
         if (!email || !password) {
             this.messages = [{ severity: 'error', detail: 'Veuillez saisir votre email et votre mot de passe.' }];

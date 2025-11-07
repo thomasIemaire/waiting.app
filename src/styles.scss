@@ -98,28 +98,11 @@ body {
 }
 
 .p-select-option,
-.p-multiselect-option {
+.p-multiselect-option,
+.p-multiselect-empty-message {
     font-size: var(--p-inputtext-sm-font-size) !important;
     padding-block: var(--p-inputtext-sm-padding-y) !important;
     padding-inline: var(--p-inputtext-sm-padding-x) !important;
-
-    .with-actions {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        .item-label {
-            pointer-events: none;
-        }
-
-        .action {
-            cursor: pointer;
-            margin-left: 8px;
-            pointer-events: auto;
-            font-size: .75rem !important;
-        }
-    }
 }
 
 .p-datatable-tbody>tr>td {
@@ -174,6 +157,10 @@ p-breadcrumb .p-breadcrumb {
 
 .w-100 {
     width: 100%;
+
+    button {
+        width: 100%;
+    }
 }
 
 .flex {
@@ -192,8 +179,16 @@ p-breadcrumb .p-breadcrumb {
     justify-content: center;
 }
 
+.justify-end {
+    justify-content: end;
+}
+
 .align-center {
     align-items: center;
+}
+
+.align-end {
+    align-items: end;
 }
 
 .gap-s {
@@ -255,6 +250,6 @@ app-input-w-label {
     gap: var(--gap-m);
 
     i {
-        font-size: .75rem;
+        font-size: .625rem;
     }
 }

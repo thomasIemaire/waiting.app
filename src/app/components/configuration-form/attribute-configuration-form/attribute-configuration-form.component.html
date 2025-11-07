@@ -27,7 +27,7 @@
             @switch (attribute.value.rule) {
             @default {
             <div class="flex align-center gap-s">
-                <p-select [options]="types" [(ngModel)]="attribute.value.parameters.regex" size="small"
+                <p-select [options]="types" [(ngModel)]="attribute.value.parameters.id" size="small"
                     placeholder="Selectionner une configuration" fluid appendTo="body">
                     <ng-template let-option pTemplate="item">
                         <div class="flex align-center gap-s space-between w-100">
@@ -49,7 +49,7 @@
             }
             @case ('data') {
             <div class="flex align-center gap-s">
-                <p-select [options]="types" [(ngModel)]="attribute.value.parameters.regex" size="small"
+                <p-select [options]="types" [(ngModel)]="attribute.value.parameters.id" size="small"
                     placeholder="Selectionner une liste de données" fluid appendTo="body">
                     <ng-template let-option pTemplate="item">
                         <div class="flex align-center gap-s space-between w-100">
@@ -72,12 +72,12 @@
             @case ('randint') {
             <div class="flex gap-s">
                 <input pInputText [(ngModel)]="attribute.value.parameters.min" type="text" pSize="small" fluid
-                    placeholder="Min" />
+                    placeholder="Min" [pKeyFilter]="'int'" />
                 <input pInputText [(ngModel)]="attribute.value.parameters.max" type="text" pSize="small" fluid
-                    placeholder="Max" />
+                    placeholder="Max" [pKeyFilter]="'int'" />
             </div>
             }
-            @case ('alphanum') {
+            @case ('alphanumeric') {
             <input pInputText [(ngModel)]="attribute.value.parameters.regex" type="text" pSize="small" fluid
                 placeholder="Expression régulière" />
             }
@@ -87,9 +87,22 @@
     <div class="form__inputs-group">
         <div class="input-w-label width-128">
             <div class="input-label" *ngIf="first">Obligations</div>
-            <p-select [options]="keys" [(ngModel)]="attribute.name" size="small"
-                placeholder="Selectionner une clé d'attribut" [editable]="true" fluid optionLabel="value"
-                optionValue="value" appendTo="body" />
+            <p-multiselect class="attribute-requirements" [(ngModel)]="attribute.requirements"
+                [options]="attribute.requirements" optionLabel="rule" display="chip" [filter]="false"
+                [showToggleAll]="false" size="small" placeholder="Requirements" appendTo="body">
+                <ng-template let-requirement #item>
+                    <div class="with-actions">
+                        <span class="item-label">{{ requirement.rule }}</span>
+                        <i class="pi pi-eye action" variant="text" severity="secondary" size="small"
+                            (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()"
+                            (keydown.enter)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()"></i>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <p-button class="flex justify-center w-100" label="Nouveau" severity="secondary" text size="small"
+                        icon="pi pi-plus" flex />
+                </ng-template>
+            </p-multiselect>
         </div>
         <div class="input-w-label">
             <div class="input-label" *ngIf="first">Fréquence</div>

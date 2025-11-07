@@ -77,6 +77,31 @@ export class RegisterComponent {
     public currentStep = 1;
     public messages: { severity: 'success' | 'info' | 'warn' | 'error'; detail: string }[] = [];
 
+    private handleKeydown = async (event: KeyboardEvent) => {
+        if (event.key !== 'Enter') {
+            return;
+        }
+
+        event.preventDefault();
+
+        if (this.currentStep < 3) {
+            const canProceed = await this.validateStep(this.currentStep);
+            if (canProceed) {
+                this.stepper(this.currentStep + 1);
+            }
+        } else {
+            this.onSubmit();
+        }
+    };
+
+    ngOnInit() {
+        document.addEventListener('keydown', this.handleKeydown);
+    }
+
+    ngOnDestroy() {
+        document.removeEventListener('keydown', this.handleKeydown);
+    }
+
     public async stepper(step: number): Promise<void> {
         this.messages = [];
 

@@ -58,7 +58,7 @@ export class FormatsForm implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['keys'] && !changes['keys'].firstChange) {
+    if (changes['keys']) {      
       this.recomputeTokens();
     }
   }
