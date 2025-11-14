@@ -16,6 +16,7 @@ export interface FormItem {
   required?: boolean;
   recommended?: boolean;
   disabled?: boolean;
+  ok?: boolean;
   calculated?: boolean;
   autofocus?: boolean;
   mask?: RegExp | KeyFilterPattern | null;
@@ -87,6 +88,7 @@ export class InputWLabelComponent {
   @Input() required: boolean = false;
   @Input() recommended: boolean = false;
   @Input() disabled: boolean = false;
+  @Input() ok: boolean = false;
   @Input() calculated: boolean = false;
   @Input() autofocus: boolean = false;
   @Input() mask: RegExp | KeyFilterPattern | null = null;
@@ -99,6 +101,7 @@ export class InputWLabelComponent {
   }
 
   public get borderStyle(): string {
+    if (this.ok) return '1px solid var(--p-green-500)';
     if (!this.isEmpty) return '';
     return this.required ? '1px solid var(--p-red-500)' :
       this.recommended ? '1px solid var(--p-yellow-500)' : '';

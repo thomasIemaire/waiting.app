@@ -4,5 +4,7 @@
 
     .agents__router-outlet {
         grid-area: 1 / 2 / 1 / 5;
+        min-height: 0;
+        overflow: hidden;
     }
 }

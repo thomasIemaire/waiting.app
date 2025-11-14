@@ -1,11 +1,11 @@
 <div class="configuration-form__wrapper">
-    <div class="form__wrapper">
+    <div class="form__wrapper" *ngIf="!waitingConfiguration">
         <app-input-w-label label="Nom" [(value)]="configuration.name" [required]="true"></app-input-w-label>
         <app-input-w-label label="Description" [(value)]="configuration.description"
             [recommended]="true"></app-input-w-label>
         <div>
-            <app-attribute-configuration-form [keys]="keys" [attribute]="attribute" [first]="i === 0"
-                *ngFor="let attribute of configuration.attributes; let i = index" (remove)="removeAttribute(i)" />
+            <app-attribute-configuration-form [rootKeys]="rootKeys" [keys]="keys" [attribute]="attribute" [first]="i === 0"
+                *ngFor="let attribute of configuration.attributes; let i = index" (remove)="removeAttribute(i)" (attributeChange)="attributeChange($event, i)" />
             <p-button label="Ajouter un attribut" icon="pi pi-plus" severity="secondary" size="small" text
                 (click)="addAttribute()" />
         </div>
@@ -16,6 +16,12 @@
                 <p-button label="Ajouter un format" icon="pi pi-plus" text severity="secondary" size="small" text
                     (click)="addFormat()" />
             </div>
+        </div>
+        <app-dnd-file *ngIf="dialog" [acceptedFileTypes]="['.json']" label="configuration" />
+        <div class="flex justify-end gap-s" *ngIf="dialog">
+            <p-button label="Annuler" severity="secondary" text size="small" (click)="ref.close(false)" />
+            <p-button label="Exporter" text size="small" (click)="ref.close(false)" />
+            <p-button label="Enregistrer" size="small" (click)="ref.close(false)" />
         </div>
     </div>
 </div>

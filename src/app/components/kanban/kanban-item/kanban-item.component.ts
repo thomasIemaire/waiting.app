@@ -135,6 +135,12 @@ export class KanbanItemComponent implements OnInit {
         }
     }
 
+    public reload(): void {
+        for (const section of this.item.sections) {
+            this.fetchSection(section);
+        }
+    }
+
     private normalizeEndpoint(endpoint: string): string {
         return (endpoint || '')
             .trim()

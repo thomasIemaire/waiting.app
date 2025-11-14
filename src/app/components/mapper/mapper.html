@@ -4,8 +4,8 @@
     <div class="group-inputs">
         <app-input-w-label type="text" [(value)]="node.label" pSize="small" style="max-width: 256px;"
             (blur)="removeNodeIfEmpty(node); emitJson()" [label]="isRoot && isFirstNode(node) ? label : ''"
-            [required]="isRoot && isFirstNode(node) && required" [autofocus]="!(isRoot && isFirstNode(node))"
-            [mask]="labelRegex"></app-input-w-label>
+            [required]="isRoot && isFirstNode(node) && required" [autofocus]="!(isRoot && isFirstNode(node)) && node.label === ''"
+            [mask]="labelRegex" [ok]="(hasNoChildren(node) && keyIsUsed(node)) || (!hasNoChildren(node) && allChildrenHasKeyUsed(node))"></app-input-w-label>
 
         <p-button *ngIf="!node.children.length && node.label" icon="pi pi-plus" variant="text" severity="secondary"
             size="small" (click)="addChild(node)" [pTooltip]="`Ajouter un enfant à ${node.label}`"
@@ -16,7 +16,7 @@
             [style.marginTop.px]="isRoot && isFirstNode(node) ? 16 : 0"></p-button>
     </div>
 
-    <app-mapper style="padding-left: 4rem;" [mapper]="node.children" (jsonChange)="onChildJsonChange()" />
+    <app-mapper style="padding-left: 4rem;" [mapper]="node.children" (jsonChange)="onChildJsonChange()" [usingKeys]="usingKeys" />
 
     <p-button *ngIf="isLastNode(node) && node.label" icon="pi pi-plus" variant="text" severity="secondary" size="small"
         (click)="addNode(node.parent)" [pTooltip]="`Ajouter un enfant à ${node.parent?.label ?? root}`"></p-button>

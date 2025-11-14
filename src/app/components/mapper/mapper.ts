@@ -64,6 +64,8 @@ export class Mapper {
 
   @Input() isRoot: boolean = false;
 
+  @Input() usingKeys: string[] = [];
+
   @Output() jsonChange = new EventEmitter<Record<string, unknown>>();
 
   @Output() keysChange = new EventEmitter<string[]>();
@@ -81,7 +83,11 @@ export class Mapper {
       this.mapper.forEach(node => {
         if (node.parent === null) node.root = this.root;
       });
-      this.reloadJson();
+
+    this.reloadJson();
+
+    if (changes['json']) 
+      this.keysChange.emit(this.getLeafKeys());     
   }
 
   private reloadJson() {
@@ -131,6 +137,19 @@ export class Mapper {
     } else if ((node.label ?? '').trim() === '' && this.isRoot && this.isFirstNode(node)) {
       node.children = [];
     }
+  }
+
+  public hasNoChildren(node: Node): boolean {
+    return !node.children || node.children.length === 0;
+  }
+
+  public allChildrenHasKeyUsed(node: Node): boolean {
+    if (!node.children || node.children.length === 0) return false;
+    return node.children.every(child => this.keyIsUsed(child) || this.allChildrenHasKeyUsed(child));
+  }
+
+  public keyIsUsed(node: Node): boolean {
+    return this.usingKeys.includes(node.key);
   }
 
   public isLastNode(node: Node): boolean {

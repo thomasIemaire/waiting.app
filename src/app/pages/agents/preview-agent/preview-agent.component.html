@@ -17,19 +17,19 @@
                     <div class="form__inputs-group">
                         <app-input-w-label label="Nom" [(value)]="model.name" [required]="true"></app-input-w-label>
                         <app-input-w-label label="Référence" [(value)]="model.reference" [required]="true"
-                            [mask]="referenceRegex"></app-input-w-label>
+                            [mask]="referencePattern"></app-input-w-label>
                     </div>
                     <app-input-w-label label="Description" [(value)]="model.description"
                         [recommended]="true"></app-input-w-label>
                     <app-mapper label="Schéma retour" [required]="true" [root]="model.reference" [isRoot]="true"
-                        (keysChange)="keys = $event" [(json)]="model.mapper" />
+                        (keysChange)="onKeysChange($event)" [(json)]="model.mapper" [usingKeys]="usingKeys"/>
                 </div>
                 <div class="form__wrapper--configuration">
                     <div class="configuration-form__header">
                         <div>Configuration</div>
-                        <div class="configuration-form__header-name">{{ configuration.name }}</div>
+                        <div class="configuration-form__header-name">{{ configuration ? configuration.name : '' }}</div>
                     </div>
-                    <app-configuration-form [keys]="keys" [configuration]="configuration" />
+                    <app-configuration-form [rootKeys]="model.reference" [keys]="keys" [configuration]="configuration" (usingKeysChange)="usingKeysChange($event)"/>
                 </div>
             </div>
             <div class="model-wrapper__footer flex gap-s justify-end">

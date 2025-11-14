@@ -66,10 +66,10 @@
 
 ::ng-deep {
     .content__wrapper .content__router-outlet {
-        overflow-y: auto;
-        overflow-x: hidden;
         height: 100%;
         flex: 1;
+        min-height: 0;
+        overflow: hidden;
 
         >*:not(router-outlet) {
             overflow-y: auto;

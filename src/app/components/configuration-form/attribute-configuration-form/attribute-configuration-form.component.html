@@ -8,32 +8,35 @@
             </div>
             <p-select [options]="keys" [(ngModel)]="attribute.key" size="small"
                 placeholder="Selectionner une clé d'attribut" [editable]="true" fluid optionLabel="value"
-                optionValue="value" appendTo="body" />
+                optionValue="value" appendTo="body" (onChange)="keyChange()" />
         </div>
         <div class="input-w-label width-128">
             <div class="input-label" *ngIf="first">Type</div>
-            <p-select [options]="types" [(ngModel)]="attribute.value.type" size="small"
-                placeholder="Selectionner un type" fluid optionValue="value" optionLabel="label" appendTo="body" />
+            <p-select [options]="types" [(ngModel)]="attribute.type" size="small" placeholder="Selectionner un type"
+                fluid optionValue="value" optionLabel="label" appendTo="body" />
         </div>
     </div>
-    <div class="form__inputs-group flex attribute-rule__wrapper">
+    <div class="form__inputs-group flex attribute-rule__wrapper gap-s">
         <div class="input-w-label width-128">
             <div class="input-label" *ngIf="first">Règle</div>
             <p-select [options]="rules" [(ngModel)]="attribute.value.rule" size="small"
-                placeholder="Selectionner une règle" optionValue="value" optionLabel="label" appendTo="body" />
+                placeholder="Selectionner une règle" optionValue="value" optionLabel="label" appendTo="body"
+                (onChange)="ruleChange()" />
         </div>
         <div class="input-w-label flex">
             <div class="input-label" *ngIf="first">Paramètres</div>
             @switch (attribute.value.rule) {
             @default {
             <div class="flex align-center gap-s">
-                <p-select [options]="types" [(ngModel)]="attribute.value.parameters.id" size="small"
+                <p-select [options]="modelConfigurationService.configurations"
+                    [(ngModel)]="attribute.value.parameters.object_id" size="small"
                     placeholder="Selectionner une configuration" fluid appendTo="body">
                     <ng-template let-option pTemplate="item">
                         <div class="flex align-center gap-s space-between w-100">
                             <span class="item-label">{{ option.label }}</span>
                             <p-button icon="pi pi-minus" text severity="danger" size="small"
-                                [style]="{ 'padding': '0' }" (click)="$event.stopPropagation();"
+                                [style]="{ 'padding': '0' }"
+                                (click)="modelConfigurationService.deleteConfiguration(option.value); $event.stopPropagation();"
                                 (mousedown)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
                                 (keydown.space)="$event.stopPropagation()" />
                         </div>
@@ -44,18 +47,18 @@
                     </ng-template>
                 </p-select>
                 <p-button icon="pi pi-eye" severity="secondary" text size="small" pTooltip="Ouvrir la configuration"
-                    tooltipPosition="left" appendTo="body" />
+                    tooltipPosition="left" appendTo="body" (click)="openConfiguration()"/>
             </div>
             }
             @case ('data') {
             <div class="flex align-center gap-s">
-                <p-select [options]="types" [(ngModel)]="attribute.value.parameters.id" size="small"
+                <p-select [options]="modelDataService.datas" [(ngModel)]="attribute.value.parameters.object_id" size="small"
                     placeholder="Selectionner une liste de données" fluid appendTo="body">
                     <ng-template let-option pTemplate="item">
                         <div class="flex align-center gap-s space-between w-100">
                             <span class="item-label">{{ option.label }}</span>
                             <p-button icon="pi pi-minus" text severity="danger" size="small"
-                                [style]="{ 'padding': '0' }" (click)="$event.stopPropagation();"
+                                [style]="{ 'padding': '0' }" (click)="modelDataService.deleteData(option.value); $event.stopPropagation();"
                                 (mousedown)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
                                 (keydown.space)="$event.stopPropagation()" />
                         </div>
@@ -66,7 +69,7 @@
                     </ng-template>
                 </p-select>
                 <p-button icon="pi pi-eye" severity="secondary" text size="small" pTooltip="Ouvrir la liste de données"
-                    tooltipPosition="left" appendTo="body" />
+                    tooltipPosition="left" appendTo="body" (click)="openData()" />
             </div>
             }
             @case ('randint') {
@@ -78,7 +81,7 @@
             </div>
             }
             @case ('alphanumeric') {
-            <input pInputText [(ngModel)]="attribute.value.parameters.regex" type="text" pSize="small" fluid
+            <input pInputText [(ngModel)]="attribute.value.parameters.constraint" type="text" pSize="small" fluid
                 placeholder="Expression régulière" />
             }
             }
@@ -91,16 +94,17 @@
                 [options]="attribute.requirements" optionLabel="rule" display="chip" [filter]="false"
                 [showToggleAll]="false" size="small" placeholder="Requirements" appendTo="body">
                 <ng-template let-requirement #item>
-                    <div class="with-actions">
+                    <div class="flex align-center gap-s space-between w-100">
                         <span class="item-label">{{ requirement.rule }}</span>
-                        <i class="pi pi-eye action" variant="text" severity="secondary" size="small"
-                            (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()"
-                            (keydown.enter)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()"></i>
+                        <p-button icon="pi pi-eye" text severity="info" size="small"
+                                [style]="{ 'padding': '0' }" (click)="openRequirementDialog(attribute, requirement, 'edit'); $event.stopPropagation();"
+                                (mousedown)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
+                                (keydown.space)="$event.stopPropagation()" />
                     </div>
                 </ng-template>
                 <ng-template pTemplate="footer">
                     <p-button class="flex justify-center w-100" label="Nouveau" severity="secondary" text size="small"
-                        icon="pi pi-plus" flex />
+                        icon="pi pi-plus" flex (click)="openRequirementDialog(attribute)" />
                 </ng-template>
             </p-multiselect>
         </div>

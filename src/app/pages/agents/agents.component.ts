@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ViewChild } from "@angular/core";
 import { CommonModule } from '@angular/common';
 import { FormsModule } from "@angular/forms";
 
@@ -13,6 +13,7 @@ import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from "@angular/ro
 
 import { filter, switchMap, of } from "rxjs";
 import { Utils } from "../../core/utils/utils";
+import { ModelsEventsService } from "../../core/services/models-events.service";
 
 @Component({
   selector: 'app-agents',
@@ -34,6 +35,9 @@ import { Utils } from "../../core/utils/utils";
 export class AgentsComponent {
   private router: Router = inject(Router);
   private route: ActivatedRoute = inject(ActivatedRoute);
+  private modelsEvents = inject(ModelsEventsService);
+
+  @ViewChild(KanbanComponent) kanban!: KanbanComponent;
 
   public kanbanAgents: KanbanItem[] = [
     {
@@ -48,7 +52,7 @@ export class AgentsComponent {
           component: KanbanAgentItemComponent,
           draggable: true,
           add: () => {
-            this.router.navigate([`/agents/${Utils.generateUUID()}`]);
+            this.router.navigate([`/agents/new`]);
             this.setActiveTab([0]);
           },
           click: (item: KanbanItem) => {
@@ -140,8 +144,13 @@ export class AgentsComponent {
       )
       .subscribe(params => {
         const agentId = params?.get('id');
+        this.setActiveTab([]);
         if (agentId) this.setActiveTab([0]);
         else this.setActiveTab(this.DEFAULT_ACTIVE_KANBAN_ITEM);
+      });
+
+      this.modelsEvents.modelCreated$.subscribe(model => {
+        this.kanban.reload([0]);
       });
   }
 

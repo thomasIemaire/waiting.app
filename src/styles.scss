@@ -192,15 +192,15 @@ p-breadcrumb .p-breadcrumb {
 }
 
 .gap-s {
-    gap: var(--gap-s);
+    gap: var(--gap-s) !important;
 }
 
 .gap-m {
-    gap: var(--gap-m);
+    gap: var(--gap-m) !important;
 }
 
 .gap-l {
-    gap: var(--gap-l);
+    gap: var(--gap-l) !important;
 }
 
 .text-center {

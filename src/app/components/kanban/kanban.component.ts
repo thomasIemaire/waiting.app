@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, QueryList, ViewChildren } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 
@@ -13,14 +13,14 @@ import { KanbanItem, KanbanItemComponent } from "./kanban-item/kanban-item.compo
 export interface Column { field: string; header?: string; }
 
 @Component({
-    selector: 'app-kanban',
-    standalone: true,
-    imports: [
-        CommonModule, FormsModule, ToastModule,
-        MultiSelectModule, InputTextModule, SelectModule, ButtonModule,
-        KanbanItemComponent
-    ],
-    template: `
+  selector: 'app-kanban',
+  standalone: true,
+  imports: [
+    CommonModule, FormsModule, ToastModule,
+    MultiSelectModule, InputTextModule, SelectModule, ButtonModule,
+    KanbanItemComponent
+  ],
+  template: `
   <div class="kanban-board__container">
     <div class="kanban-board-search__wrapper">
       <input pInputText [(ngModel)]="search" type="text" pSize="small" placeholder="Rechercher" fluid />
@@ -66,41 +66,51 @@ export interface Column { field: string; header?: string; }
     </div>
   </div>
   `,
-    styleUrls: ['./kanban.component.scss']
+  styleUrls: ['./kanban.component.scss']
 })
 export class KanbanComponent {
-    @Input({ required: true }) public items!: KanbanItem[];
-    @Input({ required: true }) public cols!: Column[];
-    @Input() public activeItem?: number[];
-    @Input() public isAnyTabActive?: boolean;
+  @Input({ required: true }) public items!: KanbanItem[];
+  @Input({ required: true }) public cols!: Column[];
+  @Input() public activeItem?: number[];
+  @Input() public isAnyTabActive?: boolean;
 
-    public search = '';
-    public searchOnlyCols: Column[] = [];
-    public filterOnCol = '';
-    public sortOrder: number = 1;
+  @ViewChildren(KanbanItemComponent) kanbanItemComponents!: QueryList<KanbanItemComponent>;
 
-    ngOnInit() {
-        this.searchOnlyCols = [...this.cols];
-        this.filterOnCol = this.cols.length ? this.cols[0].field : '';
+  public search = '';
+  public searchOnlyCols: Column[] = [];
+  public filterOnCol = '';
+  public sortOrder: number = 1;
+
+  ngOnInit() {
+    this.searchOnlyCols = [...this.cols];
+    this.filterOnCol = this.cols.length ? this.cols[0].field : '';
+  }
+
+  ngOnChanges() {
+    this.activeItem = [...this.activeItem ?? Array.from(this.items.keys())];
+  }
+
+  onColumnsFound(fields: string[]) {
+    const existing = new Set(this.cols.map(c => c.field));
+    let changed = false;
+    for (const f of fields) {
+      if (!existing.has(f)) {
+        this.cols.push({ field: f });
+        existing.add(f);
+        changed = true;
+      }
     }
-
-    ngOnChanges() {
-      this.activeItem = [...this.activeItem ?? Array.from(this.items.keys())];
+    if (changed && this.filterOnCol && !existing.has(this.filterOnCol)) {
+      this.filterOnCol = '';
     }
+    this.searchOnlyCols = this.searchOnlyCols.filter(c => existing.has(c.field));
+  }
 
-    onColumnsFound(fields: string[]) {
-        const existing = new Set(this.cols.map(c => c.field));
-        let changed = false;
-        for (const f of fields) {
-            if (!existing.has(f)) {
-                this.cols.push({ field: f });
-                existing.add(f);
-                changed = true;
-            }
-        }
-        if (changed && this.filterOnCol && !existing.has(this.filterOnCol)) {
-            this.filterOnCol = '';
-        }
-        this.searchOnlyCols = this.searchOnlyCols.filter(c => existing.has(c.field));
-    }
+  reload(indexes?: number[]): void {
+    this.kanbanItemComponents?.forEach((itemCmp, i) => {
+      if (typeof itemCmp.reload === 'function' && (!indexes || indexes.includes(i))) {
+        itemCmp.reload();
+      }
+    });
+  }
 }
