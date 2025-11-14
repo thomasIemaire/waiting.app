@@ -17,7 +17,9 @@ import { Router, RouterOutlet } from "@angular/router";
             [acceptedFileTypes]="['.pdf', '.jpg', '.png']"
             (filesUploaded)="onFilesUploaded($event)"
             [autoUpload]="true"/>
-        <router-outlet />   
+        <div class="router-outlet__wrapper">
+            <router-outlet />   
+        </div>
     </div>
     `,
     styleUrls: ['./documents.component.scss'],

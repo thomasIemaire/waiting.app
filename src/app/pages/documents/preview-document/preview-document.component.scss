@@ -43,7 +43,7 @@
                 cursor: pointer;
 
                 transition: .2s filter ease-in;
-                
+
                 &:hover {
                     filter: contrast(.85);
                 }
@@ -90,4 +90,9 @@
             }
         }
     }
+}
+
+:host ::ng-deep .textLayer span:hover {
+    background-color: var(--p-primary-500);
+    opacity: .6;
 }

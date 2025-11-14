@@ -12,7 +12,6 @@ import { KanbanAgentItemComponent } from "../../components/kanban-agent-item/kan
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from "@angular/router";
 
 import { filter, switchMap, of } from "rxjs";
-import { Utils } from "../../core/utils/utils";
 import { ModelsEventsService } from "../../core/services/models-events.service";
 
 @Component({

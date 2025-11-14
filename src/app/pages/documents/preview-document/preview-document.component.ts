@@ -14,24 +14,45 @@ import { FormsComponent } from "../../../components/forms/forms.component";
 import { DocumentsService } from "../../../core/services/documents.service";
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DeviceService } from "../../../core/services/device.service";
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
 @Component({
     selector: 'app-preview-document',
-    imports: [CommonModule, FormsModule, SelectButtonModule, ButtonModule, PreviewDocumentGlobalsComponent, PreviewDocumentDetailsComponent, ToastModule, ProgressSpinnerModule],
+    imports: [CommonModule, FormsModule, SelectButtonModule, ButtonModule, PreviewDocumentGlobalsComponent, PreviewDocumentDetailsComponent, ToastModule, ProgressSpinnerModule, NgxExtendedPdfViewerModule],
     template: `
     <p-toast />
     <div class="preview-document__wrapper">
         <div class="preview-document__header">
-            <p-button variant="text" severity="secondary" size="small" label="Retour" icon="pi pi-arrow-left" (onClick)="backDocuments()" />
-            <p-button variant="text" severity="warn" size="small" icon="pi pi-exclamation-triangle" (onClick)="addCustomer()"
-                [label]="deviceService.isMobileSize ? 'Nouveau client détecté.' : 'Cette facture contient un nouveau client, cliquer pour en savoir plus.'" />
+            <div class="flex gap-s">
+                <p-button variant="text" severity="secondary" size="small" label="Retour" icon="pi pi-arrow-left" (onClick)="backDocuments()" />
+            </div>
+            <div class="flex gap-s">
+                <p-button variant="text" severity="warn" size="small" icon="pi pi-exclamation-triangle" (onClick)="addCustomer()"
+                    [label]="deviceService.isMobileSize ? 'Nouveau client détecté.' : 'Cette facture contient un nouveau client, cliquer pour en savoir plus.'" />
+            </div>
         </div>
         <div class="preview-document__content">
-            <div *ngIf="!deviceService.isMobileSize" class="preview-document__image" [class.loading]="!previewSrc">
-                <img *ngIf="previewSrc" [src]="previewSrc" alt="Document Preview" draggable="false" />
-                 <div class="preview-document__image-loading" *ngIf="!previewSrc">
-                     <p-progress-spinner />
-                 </div>
+            <div class="preview-document__image" [class.loading]="!previewSrc" *ngIf="!deviceService.isMobileSize">
+                <ngx-extended-pdf-viewer
+                    *ngIf="pdfSrc"
+                    [src]="pdfSrc"
+                    [page]="currentPage"
+                    useBrowserLocale="true"
+                    [textLayer]="true"
+                    [showToolbar]="false"
+                    [height]="'100%'"
+                    [showVerticalScrollButton]="false"
+                    [zoom]="'page-fit'"
+                    (textLayerRendered)="onTextLayerRendered($event)"
+                    backgroundColor="transparent"
+                    [style.width.px]="600">
+                </ngx-extended-pdf-viewer>
+
+                <img *ngIf="!pdfSrc && previewSrc" [src]="previewSrc" alt="Document Preview" draggable="false" />
+
+                <div class="preview-document__image-loading" *ngIf="!previewSrc">
+                    <p-progress-spinner />
+                </div>
             </div>
             <div class="preview-document__informations">
                 <div class="preview-document__informations-content">
@@ -40,6 +61,7 @@ import { DeviceService } from "../../../core/services/device.service";
                     @case ('preview') {
                     <div class="preview-document__image" [class.loading]="!previewSrc" [style.maxWidth.%]="100">
                         <img *ngIf="previewSrc" [src]="previewSrc" alt="Document Preview" draggable="false" />
+
                         <div class="preview-document__image-loading" *ngIf="!previewSrc">
                             <p-progress-spinner />
                         </div>
@@ -82,12 +104,18 @@ export class PreviewDocumentComponent {
 
     public ref?: DynamicDialogRef | null;
 
+    // 🔹 pour ngx-extended-pdf-viewer
+    public pdfSrc: string | null = null;
+    public currentPage = 1;
+
+    // 🔹 pour ne pas attacher plusieurs fois le listener
+    private textLayerClickRegistered = false;
+
     private DEFAULT_PREVIEW_OPTS = [
         { label: this.deviceService.isMobileSize ? 'Générales' : 'Informations générales', value: 'globals' },
     ];
 
     public previewOpts = this.DEFAULT_PREVIEW_OPTS;
-
     public selectOpt = 'globals';
 
     public backDocuments(): void {
@@ -122,8 +150,7 @@ export class PreviewDocumentComponent {
     async ngOnInit(): Promise<void> {
         this.route.paramMap.subscribe(async params => {
             const documentId = params.get('id');
-            if (!documentId)
-                return;
+            if (!documentId) return;
 
             this.previewOpts = this.DEFAULT_PREVIEW_OPTS;
             if (this.deviceService.isMobileSize) {
@@ -135,14 +162,17 @@ export class PreviewDocumentComponent {
             this.base64 = response.data;
 
             if (this.base64) {
+                // 🔹 on essaie de construire la source PDF pour le viewer
+                this.pdfSrc = this.buildPdfSrc(this.base64);
+
+                // 🔹 ton image de preview (miniature)
                 this.previewSrc = await this.base64ToFirstPageImage(this.base64);
             }
         });
 
         this.route.paramMap.subscribe(async params => {
             const documentId = params.get('id');
-            if (!documentId)
-                return;
+            if (!documentId) return;
 
             this.data = null;
 
@@ -151,10 +181,16 @@ export class PreviewDocumentComponent {
 
             switch (this.data.type) {
                 case 'facture':
-                    this.previewOpts = [...this.previewOpts, { label: this.deviceService.isMobileSize ? 'Détails' : 'Détails de la facture', value: 'details' }];
+                    this.previewOpts = [
+                        ...this.previewOpts,
+                        { label: this.deviceService.isMobileSize ? 'Détails' : 'Détails de la facture', value: 'details' }
+                    ];
                     break;
                 case 'bullet-de-paie':
-                    this.previewOpts = [...this.previewOpts, { label: this.deviceService.isMobileSize ? 'Détails' : 'Détails du bulletin de paie', value: 'details' }];
+                    this.previewOpts = [
+                        ...this.previewOpts,
+                        { label: this.deviceService.isMobileSize ? 'Détails' : 'Détails du bulletin de paie', value: 'details' }
+                    ];
                     break;
             }
         });
@@ -205,6 +241,27 @@ export class PreviewDocumentComponent {
         }
     }
 
+    // 🔹 fabrique une data URL PDF si c'en est un
+    private buildPdfSrc(base64: string): string | null {
+        const splitDataUrl = (s: string) => {
+            const i = s.indexOf(',');
+            return i >= 0 ? s.slice(i + 1) : s;
+        };
+        const pure = splitDataUrl(base64);
+        const isPdfBase64 = (b64: string) => b64.startsWith('JVBERi0'); // "%PDF-"
+
+        if (!isPdfBase64(pure)) {
+            return null;
+        }
+
+        // si c’est déjà une data URL, on la garde
+        if (base64.startsWith('data:')) {
+            return base64;
+        }
+
+        return `data:application/pdf;base64,${pure}`;
+    }
+
     private async base64ToFirstPageImage(base64: string): Promise<string> {
         const splitDataUrl = (s: string) => {
             const i = s.indexOf(',');
@@ -240,5 +297,47 @@ export class PreviewDocumentComponent {
         await page.render({ canvasContext: ctx, viewport }).promise;
 
         return canvas.toDataURL('image/png');
+    }
+
+    // 🔹 appelé par ngx-extended-pdf-viewer quand la text layer est prête
+    public onTextLayerRendered(_: any): void {
+        if (this.textLayerClickRegistered) {
+            return;
+        }
+        this.textLayerClickRegistered = true;
+
+        const container = document.querySelector('.textLayer') as HTMLElement | null;
+        if (!container) {
+            return;
+        }
+
+        container.addEventListener('click', (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (target.tagName !== 'SPAN') {
+                return;
+            }
+
+            const text = (target.textContent || '').trim();
+            if (!text) {
+                return;
+            }
+
+            this.onPdfWordClicked(text);
+        });
+    }
+
+    // 🔹 ici tu fais ce que tu veux avec le mot cliqué
+    private onPdfWordClicked(word: string): void {
+        // Exemple simple : toast (pour vérifier que ça marche)
+        this.messageService.add({
+            severity: 'info',
+            summary: 'Mot sélectionné',
+            detail: `« ${word} »`,
+        });
+
+        // 👉 C’est ici que tu peux :
+        // - appeler un service qui pousse ce mot dans un store
+        // - appeler une méthode d’un composant enfant (globals/details) via @ViewChild
+        // - mettre à jour un champ de this.data, etc.
     }
 }
