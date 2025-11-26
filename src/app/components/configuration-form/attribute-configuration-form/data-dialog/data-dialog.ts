@@ -111,14 +111,39 @@ export class DataDialog implements OnInit {
   }
 
   public onConfirm(): void {
-    // Dernière validation avant fermeture
     this.validateJson();
     if (this.jsonError) return;
 
     try {
       const parsed = this.dataRaw ? JSON.parse(this.dataRaw) : [];
-      this.data = { ...this.data, data: parsed };
-      this.ref.close(this.data);
+
+      // Préparation de l'objet à envoyer
+      const payload = {
+        ...this.data,
+        data: parsed
+      };
+
+      let request$;
+
+      // Si on a un ID, c'est une modification (PUT), sinon une création (POST)
+      if (this.dataId) {
+        request$ = this.api.put(`models/data/${this.dataId}`, payload);
+      } else {
+        request$ = this.api.post('models/data/', payload);
+      }
+
+      // Exécution de la requête
+      request$.subscribe({
+        next: (savedData: any) => {
+          // On ferme la modale en renvoyant l'objet SAUVEGARDÉ (qui contient l'_id)
+          this.ref.close(savedData);
+        },
+        error: (err) => {
+          console.error("Erreur sauvegarde data", err);
+          this.jsonError = "Erreur lors de l'enregistrement serveur.";
+        }
+      });
+
     } catch (e: any) {
       this.jsonError = 'JSON invalide : ' + (e?.message ?? '');
     }

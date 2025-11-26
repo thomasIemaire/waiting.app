@@ -91,8 +91,7 @@ export class SidebarComponent {
             {
                 label: 'Flows',
                 icon: 'pi pi-sitemap',
-                link: '/flows',
-                enabled: false
+                link: '/flows'
             }
         ]
     };

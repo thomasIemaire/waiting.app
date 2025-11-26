@@ -8,6 +8,7 @@ import { PasswordModule } from "primeng/password";
 import { AutoFocusModule } from 'primeng/autofocus';
 import { InputMaskModule } from 'primeng/inputmask';
 import { KeyFilterModule, KeyFilterPattern } from 'primeng/keyfilter';
+import { PdfTargetInputDirective } from "../../core/directives/pdf-target-input.directive";
 
 export interface FormItem {
   type?: string;
@@ -24,7 +25,7 @@ export interface FormItem {
 
 @Component({
   selector: "app-input-w-label",
-  imports: [CommonModule, FormsModule, InputTextModule, Tooltip, ButtonModule, PasswordModule, AutoFocusModule, InputMaskModule, KeyFilterModule],
+  imports: [CommonModule, FormsModule, PdfTargetInputDirective, InputTextModule, Tooltip, ButtonModule, PasswordModule, AutoFocusModule, InputMaskModule, KeyFilterModule],
   standalone: true,
   template: `
     <div class="input-label">
@@ -62,6 +63,7 @@ export interface FormItem {
             [style.border]="borderStyle"
             [pAutoFocus]="autofocus"
             [pKeyFilter]="mask"
+            pdfTargetInput 
           />
         }
       }

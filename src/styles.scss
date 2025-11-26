@@ -30,10 +30,11 @@
     --padding-l: var(--gmp-static-l);
     --padding-xl: var(--gmp-static-xl);
 
-    --radius-s: calc(var(--gmp-static-s) / 2);
-    --radius-m: calc(var(--gmp-static-m) / 2);
-    --radius-l: calc(var(--gmp-static-l) / 2);
-    --radius-xl: calc(var(--gmp-static-xl) / 2);
+    --radius-multiplier: 1.5;
+    --radius-s: calc(var(--gmp-static-s) * var(--radius-multiplier));
+    --radius-m: calc(var(--gmp-static-m) * var(--radius-multiplier));
+    --radius-l: calc(var(--gmp-static-l) * var(--radius-multiplier));
+    --radius-xl: calc(var(--gmp-static-xl) * var(--radius-multiplier));
 }
 
 :root {
@@ -153,6 +154,11 @@ p-breadcrumb .p-breadcrumb {
     circle {
         stroke: var(--p-text-color) !important;
     }
+}
+
+ngx-extended-pdf-viewer .pdfViewer .page {
+    border-image: none !important;
+    border: none !important;
 }
 
 .w-100 {

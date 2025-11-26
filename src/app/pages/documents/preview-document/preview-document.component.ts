@@ -15,6 +15,7 @@ import { DocumentsService } from "../../../core/services/documents.service";
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DeviceService } from "../../../core/services/device.service";
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { FocusTargetService } from "../../../core/services/focus-target.service";
 
 @Component({
     selector: 'app-preview-document',
@@ -45,7 +46,9 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
                     [zoom]="'page-fit'"
                     (textLayerRendered)="onTextLayerRendered($event)"
                     backgroundColor="transparent"
-                    [style.width.px]="600">
+                    [style.width.px]="500"
+                    [showSidebarButton]="false"
+                    [sidebarVisible]="false">
                 </ngx-extended-pdf-viewer>
 
                 <img *ngIf="!pdfSrc && previewSrc" [src]="previewSrc" alt="Document Preview" draggable="false" />
@@ -299,7 +302,6 @@ export class PreviewDocumentComponent {
         return canvas.toDataURL('image/png');
     }
 
-    // 🔹 appelé par ngx-extended-pdf-viewer quand la text layer est prête
     public onTextLayerRendered(_: any): void {
         if (this.textLayerClickRegistered) {
             return;
@@ -326,18 +328,18 @@ export class PreviewDocumentComponent {
         });
     }
 
-    // 🔹 ici tu fais ce que tu veux avec le mot cliqué
+    private focusTargetService: FocusTargetService = inject(FocusTargetService);
     private onPdfWordClicked(word: string): void {
-        // Exemple simple : toast (pour vérifier que ça marche)
-        this.messageService.add({
-            severity: 'info',
-            summary: 'Mot sélectionné',
-            detail: `« ${word} »`,
-        });
+        const last = this.focusTargetService.getLastFocused();
+        if (!last) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Aucun champ sélectionné',
+                detail: 'Clique d’abord dans un champ texte.',
+            });
+            return;
+        }
 
-        // 👉 C’est ici que tu peux :
-        // - appeler un service qui pousse ce mot dans un store
-        // - appeler une méthode d’un composant enfant (globals/details) via @ViewChild
-        // - mettre à jour un champ de this.data, etc.
+        this.focusTargetService.insertTextAtCursor(word + ' ');
     }
 }

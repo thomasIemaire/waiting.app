@@ -75,7 +75,7 @@ export class PreviewDocumentGlobalsComponent {
                 { label: 'Nom', value: address?.name ?? '', required: true },
                 { label: 'Rue', value: address?.street ?? '' },
                 { label: 'Ville', value: address?.city ?? '' },
-                { label: 'Code Postal', value: address?.zip ?? '' },
+                { label: 'Code Postal', value: address?.zipcode ?? '' },
                 { label: 'Pays', value: address?.country ?? '' },
                 { label: 'TVA Intracommunautaire', value: analysis?.vat?.number ?? '', required: true },
                 { label: 'SIREN', value: analysis?.siren ?? '', required: true, calculated: true },
@@ -92,7 +92,7 @@ export class PreviewDocumentGlobalsComponent {
                 { label: 'Nom', value: address?.name ?? '', required: true },
                 { label: 'Rue', value: address?.street ?? '' },
                 { label: 'Ville', value: address?.city ?? '' },
-                { label: 'Code Postal', value: address?.zip ?? '' },
+                { label: 'Code Postal', value: address?.zipcode ?? '' },
                 { label: 'Pays', value: address?.country ?? '' }
             ]
         };
