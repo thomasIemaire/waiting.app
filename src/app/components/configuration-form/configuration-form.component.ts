@@ -149,6 +149,8 @@ export class ConfigurationFormComponent implements OnInit {
         if (!this.configuration) this.configuration = {};
         if (!this.configuration.attributes) this.configuration.attributes = [];
         if (!this.configuration.formats) this.configuration.formats = [];
+        // Garantit que les constantes soient toujours un tableau pour éviter les erreurs de rendu
+        if (!this.configuration.constants) this.configuration.constants = [];
         if (!this.configuration.negative_configurations) this.configuration.negative_configurations = [];
     }
 
