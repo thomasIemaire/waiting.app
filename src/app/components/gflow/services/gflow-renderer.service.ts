@@ -136,13 +136,19 @@ export class GflowRendererService {
     if (el) {
       // Coordonnées écran:
       const pr = el.getBoundingClientRect();
-      const screenX = pr.left + pr.width / 2;
-      const screenY = pr.top + pr.height / 2;
-      // Converti en Monde via service viewport:
-      return this.viewportService.toWorld(screenX, screenY);
+
+      // --- CORRECTIF ICI ---
+      // Si l'élément est en display: none (ex: ioHidden sur Agent), pr.width et pr.height valent 0.
+      // Dans ce cas, on ignore le DOM et on passe au fallback mathématique plus bas.
+      if (pr.width > 0 && pr.height > 0) {
+        const screenX = pr.left + pr.width / 2;
+        const screenY = pr.top + pr.height / 2;
+        // Converti en Monde via service viewport:
+        return this.viewportService.toWorld(screenX, screenY);
+      }
     }
 
-    // 2) Fallback géométrique (port introuvable)
+    // 2) Fallback géométrique (port introuvable ou caché)
     const node = this.state.nodes.find(n => n.id === ref.nodeId);
     if (!node) return { x: 0, y: 0 };
 
@@ -161,8 +167,8 @@ export class GflowRendererService {
 
     if (ref.kind === 'in') return { x: node.x, y };
     if (ref.kind === 'out') return { x: node.x + w, y };
-    if (ref.kind === 'entry') return { x: node.x + w / 2, y: node.y };           // ancrage haut
-    /* exit */                 return { x: node.x + w / 2, y: node.y + h };       // ancrage bas
+    if (ref.kind === 'entry') return { x: node.x + w / 2, y: node.y };
+    return { x: node.x + w / 2, y: node.y + h };
   }
 
   private nodeWidth(_node: any): number {

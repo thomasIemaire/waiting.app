@@ -9,11 +9,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TooltipModule } from 'primeng/tooltip';
-import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext'; // Correction Import
+import { ButtonModule } from 'primeng/button'; // Correction Import
 import { AutoFocusModule } from 'primeng/autofocus';
 
-type FormatObj = { format: string };
 type Token = { text: string; key?: string };
 
 @Component({
@@ -22,8 +21,8 @@ type Token = { text: string; key?: string };
   imports: [
     CommonModule,
     FormsModule,
-    InputText,
-    Button,
+    InputTextModule,
+    ButtonModule,
     AutoFocusModule,
     TooltipModule,
   ],
@@ -34,78 +33,85 @@ export class FormatsForm implements OnChanges {
   @Input() first = false;
   @Input() keys: any[] = [];
 
-  @Output() formatChange = new EventEmitter<string>();
-  @Output() remove = new EventEmitter<void>();
-
-  private _format = '';
+  // Utilisation d'un modèle interne pour ngModel
+  public internalFormat = '';
   public tokens: Token[] = [];
   public edit = false;
 
+  @Output() formatChange = new EventEmitter<string>();
+  @Output() remove = new EventEmitter<void>();
+
   @Input()
-  set format(value: string | FormatObj | null | undefined) {
+  set format(value: string | any) {
+    // Gestion robuste : accepte string ou objet {format: string}
+    let valStr = '';
     if (typeof value === 'string') {
-      this._format = value;
+      valStr = value;
     } else if (value && typeof value === 'object' && 'format' in value) {
-      this._format = (value as FormatObj).format;
-    } else {
-      this._format = '';
+      valStr = value.format;
     }
-    this.recomputeTokens();
-  }
 
-  get format(): string {
-    return this._format;
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['keys']) {      
+    // Mise à jour seulement si changement pour éviter boucles
+    if (valStr !== this.internalFormat) {
+      this.internalFormat = valStr;
       this.recomputeTokens();
     }
   }
 
-  onFormatChange() {
-    this.recomputeTokens();
-    this.emit();
+  ngOnChanges(changes: SimpleChanges) {
+    // Si les clés changent, on recalcule les labels des tokens
+    if (changes['keys'] && !changes['keys'].firstChange) {
+      this.recomputeTokens();
+    }
   }
 
-  private emit() {
-    this.formatChange.emit(this._format);
+  public validateEdit(): void {
+    this.edit = false;
+    this.onFormatChange();
+  }
+
+  public onFormatChange() {
+    this.recomputeTokens();
+    this.formatChange.emit(this.internalFormat);
   }
 
   private recomputeTokens() {
-    this.tokens = this.tokensOf(this._format);
+    this.tokens = this.tokensOf(this.internalFormat);
   }
 
-  tokensOf(format: string): Token[] {
+  private tokensOf(format: string): Token[] {
     if (!format) return [];
     const out: Token[] = [];
-    const re = /\{([^{}]+)\}/g;
+    const re = /\{([^{}]+)\}/g; // Regex pour capturer {variable}
     let lastIdx = 0;
-    let m: RegExpExecArray | null;
+    let match: RegExpExecArray | null;
 
-    while ((m = re.exec(format)) !== null) {
-      let plain = format.slice(lastIdx, m.index);
+    while ((match = re.exec(format)) !== null) {
+      // Texte avant le token
+      const plain = format.slice(lastIdx, match.index);
       if (plain) out.push({ text: plain });
 
-      const key = m[1].trim();
-      const value = this.keys.find(k => k.value === key)?.label || key;
-      out.push({ text: this.keyToLabel(value), key });
+      // Le token (la clé)
+      const key = match[1].trim();
+      const keyObj = this.keys.find(k => k.value === key);
+      const label = keyObj ? keyObj.label : key;
+
+      out.push({ text: this.keyToLabel(label), key });
 
       lastIdx = re.lastIndex;
     }
 
+    // Reste du texte à la fin
     if (lastIdx < format.length) {
-      let tail = format.slice(lastIdx);
-      tail = tail.replace(/^\s+/, ' ');
-      out.push({ text: tail });
+      out.push({ text: format.slice(lastIdx) });
     }
 
     return out;
   }
 
   private keyToLabel(key: string): string {
+    if (!key) return '';
     const parts = key.split(/[_\s]+/).filter(Boolean);
-    const last = parts[parts.length - 1] ?? key;
-    return last.toLowerCase();
+    return (parts[parts.length - 1] ?? key).toLowerCase();
   }
 }

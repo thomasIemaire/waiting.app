@@ -9,41 +9,30 @@ import { KeyFilter } from "primeng/keyfilter";
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ModelConfigurationService } from "../../../core/services/model-configuration.service";
 import { ModelDataService } from "../../../core/services/model-data.service";
-import { DialogService, DynamicDialogRef } from "primeng/dynamicdialog";
-import { DataDialog } from "./data-dialog/data-dialog";
-import { AttributeRequirementDialog } from "./attribute-requirement-dialog/attribute-requirement-dialog";
-import { ApiService } from "../../../core/services/api.service";
 import { ConfigurationFormComponent } from "../configuration-form.component";
+import { DialogService, DynamicDialogRef } from "primeng/dynamicdialog";
+import { DataDialog } from "../attribute-configuration-form/data-dialog/data-dialog";
+import { ApiService } from "../../../core/services/api.service";
 
 @Component({
-    selector: 'app-attribute-configuration-form',
+    selector: 'app-constant-configuration-form',
     imports: [CommonModule, FormsModule, SelectModule, InputTextModule, Button, Tooltip, KeyFilter, MultiSelectModule],
-    templateUrl: './attribute-configuration-form.component.html',
-    styleUrls: ['./attribute-configuration-form.component.scss'],
+    templateUrl: './constant-configuration-form.component.html',
+    styleUrls: ['./constant-configuration-form.component.scss'],
     providers: [DialogService]
 })
-export class AttributeConfigurationFormComponent {
-    @Input()
-    public rootKeys: string = "";
-
+export class ConstantConfigurationFormComponent {
     @Input()
     public first: boolean = false;
 
     @Input()
-    public keys: any[] = [];
-
-    // NOUVEAU : On reçoit la liste des constantes disponibles
-    @Input()
-    public constants: any[] = [];
-
-    @Input()
-    public attribute: any = {};
+    public constant: any = {};
 
     @Output()
     public remove: EventEmitter<void> = new EventEmitter<void>();
 
     @Output()
-    public attributeChange: EventEmitter<any> = new EventEmitter<any>();
+    public constantChange: EventEmitter<any> = new EventEmitter<any>();
 
     public modelConfigurationService: ModelConfigurationService = inject(ModelConfigurationService);
     public modelDataService: ModelDataService = inject(ModelDataService);
@@ -53,12 +42,10 @@ export class AttributeConfigurationFormComponent {
     public types: any[] = [
         { label: "Chaine de caractères", value: 'string' },
         { label: "Nombre", value: 'number' },
-        { label: "Liste", value: 'list' }
     ]
 
     public rules: any[] = [
         { label: 'Calcul / Formule', value: 'calculation' },
-        { label: 'Constante', value: 'constant' }, // NOUVEAU
         { label: 'Configuration', value: 'configuration' },
         { label: 'Entier aléatoire', value: 'randint' },
         { label: 'Expression régulière', value: 'alphanumeric' },
@@ -68,57 +55,31 @@ export class AttributeConfigurationFormComponent {
     public frequencyPattern: RegExp = /^(?:0(?:\.\d*)?|1(?:\.0*)?)$/;
 
     ngOnInit(): void {
-        if (!this.attribute.type)
-            this.attribute.type = this.types[0].value;
+        if (!this.constant.type)
+            this.constant.type = this.types[0].value;
 
-        if (!this.attribute.value.rule)
-            this.attribute.value.rule = this.rules[0].value;
-    }
-
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['keys'] || changes['rootKeys']) {
-            this.keys.forEach(key => {
-                const root = this.rootKeys ?? key.value.split('_')[0];
-                this.setRootForKeys(root.toUpperCase());
-            });
-        }
+        if (!this.constant.value.rule)
+            this.constant.value.rule = this.rules[0].value;
     }
 
     public keyChange(): void {
-        this.attributeChange.emit(this.attribute);
+        this.constantChange.emit(this.constant);
     }
 
     public ruleChange(): void {
-        if (this.attribute.value.rule === 'randint')
-            this.attribute.type = 'number';
+        if (this.constant.value.rule === 'randint')
+            this.constant.type = 'number';
 
-        if (!this.attribute.value.parameters) {
-            this.attribute.value.parameters = {};
+        // Initialiser parameters si inexistant
+        if (!this.constant.value.parameters) {
+            this.constant.value.parameters = {};
         }
-    }
-
-    private setRootForKeys(root: string): void {
-        this.keys = this.keys.map(key => {
-            return {
-                ...key,
-                value: this.restoreRootForKey(root, key.value)
-            };
-        });
-        this.attribute.key = this.restoreRootForKey(root, this.attribute.key);
-        this.attributeChange.emit(this.attribute);
-    }
-
-    private restoreRootForKey(root: string, key: string): string {
-        if (!key || !key.includes('_')) return key;
-        let attributeKeyList = key.split('_');
-        attributeKeyList[0] = root;
-        return attributeKeyList.join('_');
     }
 
     public ref?: DynamicDialogRef | null;
 
     public openConfiguration(): void {
-        const configId = this.attribute.value.parameters.object_id;
+        const configId = this.constant.value.parameters.object_id;
         if (!configId) return;
 
         const configLabel = this.modelConfigurationService.configurations?.find(c => c.value === configId)?.label || 'Configuration';
@@ -127,8 +88,6 @@ export class AttributeConfigurationFormComponent {
             header: configLabel,
             data: {
                 dialog: true,
-                keys: this.keys,
-                rootKeys: this.rootKeys,
                 configurationId: configId
             },
             width: '70%',
@@ -150,8 +109,6 @@ export class AttributeConfigurationFormComponent {
             header: 'Nouvelle Configuration',
             data: {
                 dialog: true,
-                keys: this.keys,
-                rootKeys: this.rootKeys,
                 configurationId: null
             },
             width: '70%',
@@ -176,13 +133,13 @@ export class AttributeConfigurationFormComponent {
             }));
 
             if (selectId) {
-                this.attribute.value.parameters.object_id = selectId;
+                this.constant.value.parameters.object_id = selectId;
             }
         });
     }
 
     public openData(): void {
-        const dataId = this.attribute.value.parameters.object_id;
+        const dataId = this.constant.value.parameters.object_id;
         if (!dataId) return;
 
         const dataLabel = this.modelDataService.datas?.find(d => d.value === dataId)?.label || 'Données';
@@ -232,27 +189,7 @@ export class AttributeConfigurationFormComponent {
             }));
 
             if (selectId) {
-                this.attribute.value.parameters.object_id = selectId;
-            }
-        });
-    }
-
-    public openRequirementDialog(attribute: any, requirement: any = { rule: '', constraint: '' }, method: 'add' | 'edit' = 'add') {
-        this.ref = this.dialogService.open(AttributeRequirementDialog, {
-            header: "Requirement",
-            width: '400px',
-            contentStyle: { overflow: 'auto' },
-            modal: true,
-            appendTo: 'body',
-            data: { requirement }
-        });
-
-        this.ref?.onClose.subscribe((requirementUpdated: any) => {
-            if (requirementUpdated) {
-                if (method === 'add')
-                    attribute.requirements = [...attribute.requirements, requirementUpdated];
-                else
-                    Object.assign(requirement, requirementUpdated);
+                this.constant.value.parameters.object_id = selectId;
             }
         });
     }

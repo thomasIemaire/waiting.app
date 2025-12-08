@@ -1,9 +1,25 @@
+<p-confirmDialog [draggable]="false"></p-confirmDialog>
+
 <div class="flow__container">
 
     <div class="toolbar">
-        <div class="toolbar--flowname" (click)="goBackNavigation()">
-            <i class="fa-solid fa-angle-left"></i>
-            <span class="toolbar--flowname__text">FacturX</span>
+        <div class="toolbar--left">
+            <p-button icon="fa-solid fa-angle-left" severity="secondary" size="small" rounded text
+                (click)="goBackNavigation()" />
+
+            <div>
+                @if (isEditingTitle) {
+                <input #titleInput class="title-input" type="text" [(ngModel)]="flow.title" (blur)="stopEditingTitle()"
+                    (keydown)="onTitleKeydown($event)" (mousedown)="$event.stopPropagation()" [pAutoFocus]="true" />
+                } @else {
+                <p-button iconPos="right" text rounded severity="secondary" [label]="flow.title"
+                    (click)="startEditingTitle($event)" icon="fa-solid fa-pen-to-square edit-icon" />
+                }
+            </div>
+        </div>
+
+        <div class="toolbar--actions">
+            <p-button label="Enregistrer" severity="contrast" size="small" rounded (click)="onSave()" />
         </div>
     </div>
 
@@ -39,7 +55,8 @@
                             </defs>
 
                             @for (l of links; track l.id) {
-                            <g>
+                            <g class="wire-group" [class.is-focused]="focusedLink?.id === l.id"
+                                (click)="onLinkClick($event, l)">
                                 <path class="wire" [class.wire--dashed]="l.relation === 'entry-exit'" [attr.d]="l.d"
                                     marker-end="url(#arrow)"></path>
                                 <path class="wire-hit" [attr.d]="l.d"></path>
@@ -98,9 +115,9 @@
         <aside class="config-sidebar" (mousedown)="$event.stopPropagation()">
 
             <div class="config-sidebar__content">
-                <app-gflow-config-panel [node]="focusedNode" [nodes]="nodes" [links]="links"
+                <app-gflow-config-panel [node]="focusedNode" [link]="focusedLink" [nodes]="nodes" [links]="links"
                     [inputMap]="focusedInputMap" (configChange)="onNodeConfigChange($event)" (cancel)="closeConfig()"
-                    (save)="closeConfig()">
+                    (save)="closeConfig()" (delete)="onDeleteFromPanel()">
                 </app-gflow-config-panel>
             </div>
 

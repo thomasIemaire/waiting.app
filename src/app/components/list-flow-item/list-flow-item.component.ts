@@ -9,6 +9,9 @@ import { UserService } from "../../core/services/user.service";
     <div class="list-flow-item__container">
         <div class="list-flow-item__wrapper">
             <div class="list-flow-item__header">
+                <div *ngIf="flow.default || true" class="list-flow-item__header-icon orange">
+                    <i class="fa-regular fa-circle-dot"></i>
+                </div>
                 <div class="list-flow-item__header-icon">
                     <i class="pi pi-sitemap"></i>
                 </div>

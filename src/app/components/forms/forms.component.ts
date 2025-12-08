@@ -22,9 +22,14 @@ export interface Form {
             [label]="item.label ?? ''"
             [(value)]="item.value"
             [required]="item.required || false"
+            [tooltip]="item.tooltip || ''"
             [recommended]="item.recommended || false"
             [disabled]="item.disabled || false"
             [calculated]="item.calculated || false"
+            [mask]="item.mask ||null"
+            
+            [options]="item.options || []"
+            [editable]="item.editable || false"
           />
         </div>
       </div>

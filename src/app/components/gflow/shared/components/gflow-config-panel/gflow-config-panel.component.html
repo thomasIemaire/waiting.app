@@ -1,23 +1,42 @@
-<ng-container *ngIf="node as current; else emptyState">
-  <ng-container *ngIf="current.configComponent; else noConfig">
-    <app-config-base
-      [title]="current.name || ''"
-      [component]="current.configComponent"
-      [componentInputs]="componentInputs"
-      (cancel)="cancel.emit()"
-      (save)="save.emit()"
-      (configChange)="configChange.emit($event)"
-    ></app-config-base>
+<ng-container *ngIf="node; else linkConfig">
+  <ng-container *ngIf="node.configComponent; else noConfig">
+    <app-config-base [title]="node.name || ''" [component]="node.configComponent" [componentInputs]="componentInputs"
+      [canDelete]="node.type !== 'start'" (cancel)="cancel.emit()" (save)="save.emit()" (delete)="delete.emit()"
+      (configChange)="configChange.emit($event)">
+    </app-config-base>
   </ng-container>
   <ng-template #noConfig>
     <div class="config-panel__empty">
       <em>Aucun panneau de configuration pour ce nœud.</em>
+      <p style="margin-top: 1rem;" *ngIf="node.type !== 'start'">
+        <p-button label="Supprimer le nœud" severity="danger" text size="small" icon="pi pi-trash"
+          (onClick)="delete.emit()" />
+      </p>
     </div>
   </ng-template>
 </ng-container>
 
+<ng-template #linkConfig>
+  <ng-container *ngIf="link; else emptyState">
+    <app-config-base title="Inspecter le lien" [component]="null" (cancel)="cancel.emit()" (save)="save.emit()"
+      (delete)="delete.emit()">
+      <div style="padding: 0.5rem;">
+        <label style="font-weight: 600; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Données transportées
+          (Map)</label>
+        <div
+          style="background: var(--surface-100); padding: 0.5rem; border-radius: 6px; border: 1px solid var(--surface-300); overflow: auto; max-height: 300px;">
+          <pre style="margin: 0; font-size: 0.75rem; font-family: monospace;">{{ link.map | json }}</pre>
+        </div>
+        <p style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-muted-color);">
+          Ce lien relie le nœud <strong>{{link.src.nodeId}}</strong> au nœud <strong>{{link.dst.nodeId}}</strong>.
+        </p>
+      </div>
+    </app-config-base>
+  </ng-container>
+</ng-template>
+
 <ng-template #emptyState>
   <div class="config-panel__empty">
-    <em>Sélectionnez un nœud pour afficher sa configuration.</em>
+    <em>Sélectionnez un élément pour afficher sa configuration.</em>
   </div>
 </ng-template>

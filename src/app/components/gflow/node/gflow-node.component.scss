@@ -33,7 +33,7 @@
         background-color: var(--background-color-300);
 
         .node__name {
-            color: var(--p-text-muted-color);;
+            color: var(--p-text-muted-color);
         }
 
         .node__icon {
@@ -73,6 +73,32 @@
     font-size: 0.9rem;
     color: var(--p-text-color);
     white-space: nowrap;
+    line-height: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+
+    line-height: 1;
+
+    .node__subname {
+        font-weight: 400;
+        font-size: 0.75rem;
+        color: var(--p-text-muted-color);
+
+        display: flex;
+        align-items: center;
+        gap: var(--gap-m);
+
+        .node__tag {
+            background-color: var(--background-color-200);
+            color: var(--p-text-muted-color);
+            padding: 2px 6px;
+            border-radius: 40px;
+            font-size: 0.5rem;
+            font-weight: 500;
+        }
+    }
 }
 
 .node__body {
@@ -124,7 +150,7 @@
 .ports-wrapper {
     position: absolute;
     display: flex;
-    gap: 8px;
+    gap: 24px;
 
     align-items: center;
     justify-content: center;
@@ -145,14 +171,14 @@
 }
 
 .entries-centered {
-    top: calc(var(--port-size) / -2);
+    bottom: calc(var(--port-size) / -2);
     left: 0;
     right: 0;
     flex-direction: row;
 }
 
 .exits-centered {
-    bottom: calc(var(--port-size) / -2);
+    top: calc(var(--port-size) / -2);
     left: 0;
     right: 0;
     flex-direction: row;

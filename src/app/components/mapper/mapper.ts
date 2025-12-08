@@ -8,7 +8,6 @@ import { TooltipModule } from 'primeng/tooltip';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { Toast } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { label } from '@primeuix/themes/aura/metergroup';
 import { InputWLabelComponent } from "../input-w-label/input-w-label.component";
 
 class Node {

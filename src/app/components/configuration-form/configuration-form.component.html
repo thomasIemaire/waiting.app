@@ -1,27 +1,85 @@
 <div class="configuration-form__wrapper">
+    <div *ngIf="waitingConfiguration" class="flex justify-center p-4">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+    </div>
+
     <div class="form__wrapper" *ngIf="!waitingConfiguration">
-        <app-input-w-label label="Nom" [(value)]="configuration.name" [required]="true"></app-input-w-label>
-        <app-input-w-label label="Description" [(value)]="configuration.description"
-            [recommended]="true"></app-input-w-label>
-        <div>
-            <app-attribute-configuration-form [rootKeys]="rootKeys" [keys]="keys" [attribute]="attribute" [first]="i === 0"
-                *ngFor="let attribute of configuration.attributes; let i = index" (remove)="removeAttribute(i)" (attributeChange)="attributeChange($event, i)" />
-            <p-button label="Ajouter un attribut" icon="pi pi-plus" severity="secondary" size="small" text
-                (click)="addAttribute()" />
-        </div>
-        <div class="form__wrapper">
-            <app-formats-form [keys]="keys" [format]="format" [first]="i === 0"
-                *ngFor="let format of configuration.formats; let i = index" (remove)="removeFormat(i)" />
+
+        <div *ngIf="!showForm" class="flex align-center justify-center gap-m" style="padding: 2rem;">
             <div>
-                <p-button label="Ajouter un format" icon="pi pi-plus" text severity="secondary" size="small" text
-                    (click)="addFormat()" />
+                Aucune configuration définie pour ce modèle.
             </div>
+            <p-button label="Ajouter une configuration" icon="pi pi-plus" (click)="createConfiguration()" size="small">
+            </p-button>
         </div>
-        <app-dnd-file *ngIf="dialog" [acceptedFileTypes]="['.json']" label="configuration" />
-        <div class="flex justify-end gap-s" *ngIf="dialog">
-            <p-button label="Annuler" severity="secondary" text size="small" (click)="ref.close(false)" />
-            <p-button label="Exporter" text size="small" (click)="ref.close(false)" />
-            <p-button label="Enregistrer" size="small" (click)="ref.close(false)" />
-        </div>
+
+        <ng-container *ngIf="showForm">
+            <app-input-w-label label="Nom" [(value)]="configuration.name" [required]="true"></app-input-w-label>
+
+            <app-input-w-label label="Description" [(value)]="configuration.description"
+                [recommended]="true"></app-input-w-label>
+
+            <div>
+                <app-constant-configuration-form [constant]="constant" [first]="i === 0"
+                    *ngFor="let constant of configuration.constants; let i = index" (remove)="removeConstant(i)"
+                    (constantChange)="constantChange($event, i)" />
+
+                <p-button label="Ajouter une constante" icon="pi pi-plus" severity="secondary" size="small" text
+                    (click)="addConstant()" />
+            </div>
+
+            <div>
+                <app-attribute-configuration-form [rootKeys]="rootKeys" [keys]="keys" [attribute]="attribute"
+                    [constants]="configuration.constants" [first]="i === 0"
+                    *ngFor="let attribute of configuration.attributes; let i = index" (remove)="removeAttribute(i)"
+                    (attributeChange)="attributeChange($event, i)" />
+
+                <p-button label="Ajouter un attribut" icon="pi pi-plus" severity="secondary" size="small" text
+                    (click)="addAttribute()" />
+            </div>
+
+            <div class="form__wrapper">
+                <app-formats-form [keys]="keys" [format]="format" [first]="i === 0"
+                    *ngFor="let format of configuration.formats; let i = index" (remove)="removeFormat(i)"
+                    (formatChange)="updateFormat($event, i)" />
+
+                <div>
+                    <p-button label="Ajouter un format" icon="pi pi-plus" text severity="secondary" size="small" text
+                        (click)="addFormat()" />
+                </div>
+            </div>
+
+            <div *ngIf="!dialog" class="input-w-label">
+                <div class="input-label">
+                    Configurations négatives
+                    <i class="pi pi-info-circle"
+                        pTooltip="Ces configurations seront utilisées pour générer des exemples négatifs (sans labels) afin de réduire les hallucinations du modèle."
+                        tooltipPosition="right"></i>
+                </div>
+
+                <p-multiselect [options]="availableNegativeConfigurations"
+                    [(ngModel)]="configuration.negative_configurations" size="small"
+                    defaultLabel="Sélectionner des configurations de bruit" optionLabel="label" optionValue="value"
+                    display="chip" [filter]="true" appendTo="body" [style]="{'width':'100%'}">
+
+                    <ng-template pTemplate="footer">
+                        <div class="p-2 w-full">
+                            <p-button label="Nouvelle configuration de bruit" icon="pi pi-plus" severity="secondary"
+                                text size="small" styleClass="w-full" (click)="createNegativeConfiguration()">
+                            </p-button>
+                        </div>
+                    </ng-template>
+                </p-multiselect>
+            </div>
+
+            <app-dnd-file *ngIf="dialog" [acceptedFileTypes]="['.json']" label="configuration" />
+
+            <div class="flex justify-end gap-s" *ngIf="dialog">
+                <p-button label="Annuler" severity="secondary" text size="small" (click)="ref.close(false)" />
+                <p-button label="Exporter" text size="small" (click)="ref.close(false)" />
+                <p-button label="Enregistrer" size="small" (click)="save()" />
+            </div>
+        </ng-container>
+
     </div>
 </div>

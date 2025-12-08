@@ -9,6 +9,17 @@
       </div>
       <div class="node__name">
         <span>{{ item.name }}</span>
+        @if (item.type === 'agent') {
+        <div class="node__subname">
+          <span>{{item.config.agentName}}</span>
+          <span class="node__tag">{{item.config.version}}</span>
+        </div>
+        }
+        @if (item.type === 'end') {
+        <div class="node__subname">
+          <span>{{item.config.status}}</span>
+        </div>
+        }
       </div>
     </div>
 

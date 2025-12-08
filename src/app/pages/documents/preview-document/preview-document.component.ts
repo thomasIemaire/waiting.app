@@ -46,7 +46,7 @@ import { FocusTargetService } from "../../../core/services/focus-target.service"
                     [zoom]="'page-fit'"
                     (textLayerRendered)="onTextLayerRendered($event)"
                     backgroundColor="transparent"
-                    [style.width.px]="500"
+                    [style.width.%]="100"
                     [showSidebarButton]="false"
                     [sidebarVisible]="false">
                 </ngx-extended-pdf-viewer>

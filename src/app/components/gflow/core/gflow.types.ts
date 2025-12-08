@@ -13,7 +13,7 @@ export interface GFlowPort {
   map?: JsonValue;
 }
 
-export type GFlowConfig = unknown;
+export type GFlowConfig = any;
 
 export type NodeType =
   | 'new'
@@ -24,6 +24,7 @@ export type NodeType =
   | 'merge'
   | 'edit'
   | 'sardine'
+  | 'zone-detection'
   | 'agent'
   | 'agent-group';
 

@@ -8,28 +8,36 @@ import { PasswordModule } from "primeng/password";
 import { AutoFocusModule } from 'primeng/autofocus';
 import { InputMaskModule } from 'primeng/inputmask';
 import { KeyFilterModule, KeyFilterPattern } from 'primeng/keyfilter';
+import { SelectModule } from 'primeng/select'; // <-- Import ajouté
 import { PdfTargetInputDirective } from "../../core/directives/pdf-target-input.directive";
 
 export interface FormItem {
   type?: string;
   label?: string;
+  key?: string;
   value: any;
   required?: boolean;
   recommended?: boolean;
+  tooltip?: string;
   disabled?: boolean;
   ok?: boolean;
   calculated?: boolean;
   autofocus?: boolean;
   mask?: RegExp | KeyFilterPattern | null;
+  // Nouveaux champs pour le select
+  options?: any[];
+  editable?: boolean;
 }
 
 @Component({
   selector: "app-input-w-label",
-  imports: [CommonModule, FormsModule, PdfTargetInputDirective, InputTextModule, Tooltip, ButtonModule, PasswordModule, AutoFocusModule, InputMaskModule, KeyFilterModule],
+  // Ajout de SelectModule dans les imports
+  imports: [CommonModule, FormsModule, PdfTargetInputDirective, InputTextModule, Tooltip, ButtonModule, PasswordModule, AutoFocusModule, InputMaskModule, KeyFilterModule, SelectModule],
   standalone: true,
   template: `
     <div class="input-label">
       <div>{{ label }}<span *ngIf="required" class="required-indicator">*</span></div>
+      <i *ngIf="tooltip" class="pi pi-info-circle" [pTooltip]="tooltip" tooltipPosition="right"></i>
     </div>
 
     <div class="input-w-label__item-input">
@@ -48,6 +56,22 @@ export interface FormItem {
             [style.border]="borderStyle"
             [pAutoFocus]="autofocus"
           />
+        }
+        @case('select') {
+            <p-select 
+                [(ngModel)]="value"
+                (ngModelChange)="valueChange.emit($event)"
+                [options]="options"
+                [editable]="editable"
+                optionLabel="label"
+                optionValue="value"
+                size="small"
+                [placeholder]="label"
+                fluid
+                appendTo="body"
+                [disabled]="disabled"
+                [style.border]="borderStyle"
+            />
         }
         @default {
           <input
@@ -89,11 +113,16 @@ export class InputWLabelComponent {
   @Input() value: any = '';
   @Input() required: boolean = false;
   @Input() recommended: boolean = false;
+  @Input() tooltip?: string;
   @Input() disabled: boolean = false;
   @Input() ok: boolean = false;
   @Input() calculated: boolean = false;
   @Input() autofocus: boolean = false;
   @Input() mask: RegExp | KeyFilterPattern | null = null;
+
+  // Nouveaux Inputs
+  @Input() options: any[] = [];
+  @Input() editable: boolean = false;
 
   @Output() valueChange = new EventEmitter<any>();
   @Output() blur = new EventEmitter<any>();
@@ -110,7 +139,6 @@ export class InputWLabelComponent {
   }
 
   onBlur(): void {
-    // si tu veux aussi renvoyer la valeur au blur
     this.valueChange.emit(this.value);
     this.blur.emit(this.value);
   }

@@ -1,3 +1,6 @@
 <div class="preview-flow__wrapper">
-    <app-gflow navigateBack="/flows"/>
+    <p-toast />
+    <p-confirmdialog [draggable]="false"/>
+    <app-gflow navigateBack="/flows" (saveFlow)="onSaveFlow($event)">
+    </app-gflow>
 </div>

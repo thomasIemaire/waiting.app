@@ -158,29 +158,38 @@ export class GflowStateService {
     return newNode;
   }
 
-  removeGroupEntry(group: GFlowNode, index: number) {
+  // --- CORRECTION MAJEURE ICI ---
+  removeGroupEntry(group: GFlowNode, indexToRemove: number) {
+    // 1. Supprimer les liens connectés exactement à ce port (entry index)
     this.links = this.links.filter(
       (link) =>
         !(
           link.relation === 'entry-exit' &&
           link.src.nodeId === group.id &&
           link.src.kind === 'entry' &&
-          link.src.portIndex === index
+          link.src.portIndex === indexToRemove
         ),
     );
 
+    // 2. Décaler les index des liens connectés aux ports SUIVANTS (index > indexToRemove)
+    // Sinon, le lien pointera vers le mauvais slot après la suppression dans le tableau
     this.links.forEach((link) => {
       if (
         link.relation === 'entry-exit' &&
         link.src.nodeId === group.id &&
         link.src.kind === 'entry' &&
-        link.src.portIndex > index
+        link.src.portIndex > indexToRemove
       ) {
         link.src = { ...link.src, portIndex: link.src.portIndex - 1 };
       }
     });
 
-    group.entries?.splice(index, 1);
+    // 3. Supprimer l'entrée du tableau du nœud
+    if (group.entries) {
+      group.entries.splice(indexToRemove, 1);
+    }
+
+    // 4. Recalculer les maps
     this.recomputeDownstreamFrom(group.id);
   }
 

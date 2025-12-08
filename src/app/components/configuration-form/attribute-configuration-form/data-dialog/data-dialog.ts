@@ -2,7 +2,7 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig, DynamicDialogModule } from 'primeng/dynamicdialog';
-import { Textarea } from 'primeng/textarea';
+import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
 import { ApiService } from '../../../../core/services/api.service';
 import { Base64File, DndFileComponent } from "../../../dnd-file/dnd-file.component";
@@ -10,7 +10,7 @@ import { InputWLabelComponent } from "../../../input-w-label/input-w-label.compo
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, DynamicDialogModule, Textarea, DndFileComponent, InputWLabelComponent],
+  imports: [CommonModule, FormsModule, ButtonModule, DynamicDialogModule, TextareaModule, DndFileComponent, InputWLabelComponent],
   template: `
     <div *ngIf="loaded; else loadingTpl">
       <div class="form__wrapper">
@@ -18,95 +18,81 @@ import { InputWLabelComponent } from "../../../input-w-label/input-w-label.compo
 
         <div class="input-w-label">
           <span class="input-label">Liste de données (JSON)</span>
-          <textarea pInputTextarea pSize="small" [(ngModel)]="dataRaw" rows="10" placeholder="Données (JSON)"></textarea>
+          <textarea pInputTextarea pSize="small" [(ngModel)]="dataRaw" (ngModelChange)="validateJson()" rows="10" placeholder="Données (JSON)"></textarea>
         </div>
 
-        <small *ngIf="jsonError" style="color:#d32f2f">
-          {{ jsonError }}
+        <small *ngIf="jsonError" style="color:var(--red-500); display: block; margin-top: 0.25rem;">
+          <i class="pi pi-times-circle"></i> {{ jsonError }}
         </small>
 
         <app-dnd-file [acceptedFileTypes]="['.json']" label="liste de données" (fileBase64)="readJson($event)"/>
 
-        <div class="flex justify-end gap-s">
+        <div class="flex justify-end gap-s" style="margin-top: 1rem;">
           <p-button size="small" text severity="secondary" label="Annuler" (click)="ref.close(false)"></p-button>
-          <p-button size="small" text label="Exporter" (click)="ref.close(false)"></p-button>
-          <p-button size="small" label="Enregistrer" [disabled]="!!jsonError" (click)="onConfirm()"></p-button>
+          <p-button size="small" label="Enregistrer" [disabled]="!!jsonError || !data.name" (click)="onConfirm()"></p-button>
         </div>
       </div>
     </div>
 
     <ng-template #loadingTpl>
-      <div class="form__wrapper">Chargement…</div>
-      <div class="dialog-footer">
-        <p-button size="small" text severity="secondary" label="Fermer" (click)="ref.close(false)"></p-button>
+      <div class="flex align-center justify-center p-4">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
       </div>
     </ng-template>
   `,
   styles: [`
-    .dialog-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.5rem;
-      margin-top: 1rem;
-    }
-
-    textarea {
-      resize: none;
-    }
+    .form__wrapper { display: flex; flex-direction: column; gap: 1rem; }
+    textarea { resize: vertical; width: 100%; font-family: monospace; }
   `]
 })
 export class DataDialog implements OnInit {
   @Input() public dataId: string = '';
 
-  public data: any;
-  public dataRaw = '';           // tampon texte pour le JSON
+  public data: any = { name: '', data: [] };
+  public dataRaw = '';
   public jsonError: string | null = null;
   public loaded = false;
 
   private api: ApiService = inject(ApiService);
 
-  constructor(public ref: DynamicDialogRef, public cfg: DynamicDialogConfig) { }
+  constructor(public ref: DynamicDialogRef, public cfg: DynamicDialogConfig) {
+    // CORRECTION ICI : Gestion unifiée de la récupération des données
+    if (this.cfg.data) {
+      // Priorité à la propriété directe 'dataId' envoyée par le nouveau code
+      // Fallback sur 'inputValues.dataId' pour la rétrocompatibilité
+      this.dataId = this.cfg.data.dataId || (this.cfg.data.inputValues ? this.cfg.data.inputValues.dataId : '');
+    }
+  }
 
   ngOnInit(): void {
     if (!this.dataId) {
-      this.data = { name: '', data: [] };
-      this.dataRaw = this.jsonify(this.data.data);
-      this.loaded = true;
+      this.initData({ name: '', data: [] });
       return;
     }
 
     this.api.get(`models/data/${this.dataId}`).subscribe({
-      next: (res: any) => {
-        this.data = res ?? { name: '', data: [] };
-        this.dataRaw = this.jsonify(this.data.data);
-        this.validateJson();
-        this.loaded = true;
-      },
-      error: () => {
-        // fallback minimal en cas d'erreur d’API
-        this.data = { name: '', data: [] };
-        this.dataRaw = this.jsonify(this.data.data);
-        this.loaded = true;
+      next: (res: any) => this.initData(res),
+      error: (err) => {
+        console.error(err);
+        this.initData({ name: '', data: [] });
       }
     });
   }
 
-  // Sérialise joliment (évite l’appel dans ngModel)
-  public jsonify(obj: any) {
-    try {
-      return JSON.stringify(obj ?? [], null, 2);
-    } catch {
-      return '[]';
-    }
+  private initData(dataObj: any) {
+    this.data = dataObj ?? { name: '', data: [] };
+    this.dataRaw = JSON.stringify(this.data.data, null, 2);
+    this.validateJson();
+    this.loaded = true;
   }
 
-  // Valide en continu le JSON saisi (à appeler si besoin sur (ngModelChange))
   public validateJson(): void {
     try {
-      JSON.parse(this.dataRaw || '[]');
+      const val = this.dataRaw.trim();
+      if (val) JSON.parse(val);
       this.jsonError = null;
     } catch (e: any) {
-      this.jsonError = 'JSON invalide : ' + (e?.message ?? '');
+      this.jsonError = 'JSON invalide';
     }
   }
 
@@ -115,81 +101,39 @@ export class DataDialog implements OnInit {
     if (this.jsonError) return;
 
     try {
-      const parsed = this.dataRaw ? JSON.parse(this.dataRaw) : [];
+      const parsedData = this.dataRaw ? JSON.parse(this.dataRaw) : [];
+      const payload = { ...this.data, data: parsedData };
 
-      // Préparation de l'objet à envoyer
-      const payload = {
-        ...this.data,
-        data: parsed
-      };
+      const request$ = this.dataId
+        ? this.api.put(`models/data/${this.dataId}`, payload)
+        : this.api.post('models/data/', payload);
 
-      let request$;
-
-      // Si on a un ID, c'est une modification (PUT), sinon une création (POST)
-      if (this.dataId) {
-        request$ = this.api.put(`models/data/${this.dataId}`, payload);
-      } else {
-        request$ = this.api.post('models/data/', payload);
-      }
-
-      // Exécution de la requête
       request$.subscribe({
-        next: (savedData: any) => {
-          // On ferme la modale en renvoyant l'objet SAUVEGARDÉ (qui contient l'_id)
-          this.ref.close(savedData);
-        },
+        next: (savedData: any) => this.ref.close(savedData),
         error: (err) => {
-          console.error("Erreur sauvegarde data", err);
-          this.jsonError = "Erreur lors de l'enregistrement serveur.";
+          console.error("Save error", err);
+          this.jsonError = "Erreur serveur lors de la sauvegarde.";
         }
       });
-
-    } catch (e: any) {
-      this.jsonError = 'JSON invalide : ' + (e?.message ?? '');
+    } catch (e) {
+      this.jsonError = "Erreur inattendue lors du traitement.";
     }
   }
 
   public readJson(file: Base64File): void {
+    if (!file.base64) return;
     try {
-      const b64 = this.extractBase64(file.base64);
-      if (!b64) {
-        this.jsonError = 'Aucun contenu base64 détecté.';
-        return;
-      }
-
-      const jsonText = this.base64ToUtf8(b64).trim();
-      const parsed = jsonText ? JSON.parse(jsonText) : [];
-
-      this.dataRaw = this.jsonify(parsed);
+      const content = file.base64.split(',')[1] || file.base64;
+      // Utilisation de decodeURIComponent pour mieux gérer l'UTF-8 si possible
+      const jsonText = decodeURIComponent(escape(atob(content)));
+      const parsed = JSON.parse(jsonText);
 
       this.data.name = file.name.replace(/\.json$/i, '');
-      this.data = { ...this.data, data: parsed };
-
+      this.dataRaw = JSON.stringify(parsed, null, 2);
       this.jsonError = null;
-    } catch (e: any) {
-      this.jsonError = 'JSON invalide : ' + (e?.message ?? '');
+    } catch (e) {
+      this.jsonError = "Impossible de lire le fichier JSON.";
+      console.error(e);
     }
-  }
-
-  private extractBase64(payload: string | { base64?: string } | null | undefined): string | null {
-    if (!payload) return null;
-
-    let raw = typeof payload === 'string' ? payload : payload.base64 ?? '';
-    raw = raw.trim();
-
-    const commaIdx = raw.indexOf(',');
-    if (raw.startsWith('data:') && commaIdx >= 0) {
-      return raw.slice(commaIdx + 1);
-    }
-    return raw || null;
-  }
-
-  private base64ToUtf8(b64: string): string {
-    const binary = atob(b64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return new TextDecoder('utf-8', { fatal: false }).decode(bytes);
   }
 }

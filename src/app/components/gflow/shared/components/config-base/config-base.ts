@@ -22,12 +22,23 @@ import { Subscription } from 'rxjs';
   imports: [CommonModule, ButtonModule],
   template: `
     <div class="config-base">
-      <header class="config-base__header" *ngIf="title">
+      <header class="config-base__header">
         <h3 class="config-base__title">{{ title }}</h3>
+        <p-button 
+            *ngIf="canDelete"
+            icon="pi pi-trash" 
+            severity="danger" 
+            text 
+            rounded 
+            size="small" 
+            (onClick)="onDeleteClick()"
+            pTooltip="Supprimer"
+            tooltipPosition="bottom" />
       </header>
 
       <section class="config-base__body">
         <ng-container #componentHost></ng-container>
+        <ng-content></ng-content>
       </section>
 
       <footer class="config-base__footer">
@@ -47,7 +58,7 @@ import { Subscription } from 'rxjs';
   `,
   styles: [`
     .config-base { display: flex; flex-direction: column; height: 100%; gap: 1rem; }
-    .config-base__header { border-bottom: 1px solid var(--surface-300); padding-bottom: .5rem; }
+    .config-base__header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--surface-300); padding-bottom: .5rem; min-height: 2.5rem; }
     .config-base__title { margin: 0; font-size: 1.1rem; font-weight: 600; }
     .config-base__body { flex: 1 1 auto; overflow: auto; display: flex; flex-direction: column; gap: .75rem; }
     .config-base__footer { display: flex; justify-content: flex-end; gap: .5rem; border-top: 1px solid var(--surface-300); padding-top: .5rem; }
@@ -60,8 +71,12 @@ export class ConfigBase implements AfterViewInit, OnChanges, OnDestroy {
   @Input() component: Type<unknown> | null = null;
   @Input() componentInputs: Record<string, unknown> | null = null;
 
+  // Correction : Ajout de la propriété pour contrôler la suppression
+  @Input() canDelete: boolean = true;
+
   @Output() cancel = new EventEmitter<void>();
   @Output() save = new EventEmitter<void>();
+  @Output() delete = new EventEmitter<void>();
   @Output() configChange = new EventEmitter<unknown>();
 
   @ViewChild('componentHost', { read: ViewContainerRef }) componentHost!: ViewContainerRef;
@@ -85,7 +100,7 @@ export class ConfigBase implements AfterViewInit, OnChanges, OnDestroy {
       this.renderComponent();
     }
 
-    if (changes['componentInputs']) {
+    else if (changes['componentInputs']) {
       this.applyInputs();
     }
   }
@@ -96,6 +111,7 @@ export class ConfigBase implements AfterViewInit, OnChanges, OnDestroy {
 
   onCancelClick() { this.cancel.emit(); }
   onSaveClick() { this.save.emit(); }
+  onDeleteClick() { this.delete.emit(); }
 
   private renderComponent() {
     this.destroyInner();

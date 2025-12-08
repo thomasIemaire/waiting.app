@@ -2,6 +2,8 @@ import { definePreset } from "@primeuix/themes";
 import Aura from '@primeuix/themes/aura';
 
 import { toggleswitch } from "./toggle-switch";
+import { progressbar } from "./progress-bar";
+import { tag } from "./tag";
 
 export const defaultTheme = definePreset(Aura, {
     primitive: {
@@ -729,6 +731,8 @@ export const defaultTheme = definePreset(Aura, {
         }
     },
     components: {
-        toggleswitch
+        toggleswitch,
+        progressbar,
+        tag
     }
 });

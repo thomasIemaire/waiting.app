@@ -1,7 +1,6 @@
 import { ConfigAgentGroup, createAgentGroupConfig } from '../configs/config-agent-group/config-agent-group';
 import {
   ConfigAgent,
-  createAgentConfig,
   createAgentOutputPorts,
 } from '../configs/config-agent/config-agent';
 import { ConfigEdit, createEditConfig } from '../configs/config-edit/config-edit';
@@ -179,6 +178,21 @@ const definitions: NodeTypeDefinition[] = [
     }),
   },
   {
+    type: 'zone-detection',
+    label: 'Detection de zone',
+    icon: { icon: 'fa-solid fa-file-lines' },
+    color: '#DEF5EE',
+    category: 'Agents',
+    create: () => ({
+      name: 'Detection de zone',
+      inputs: clonePorts([{}]),
+      outputs: clonePorts([{}]),
+      configured: false,
+      config: {},
+      configComponent: null,
+    }),
+  },
+  {
     type: 'agent',
     label: 'Agent',
     icon: { icon: 'fa-solid fa-location-arrow' },
@@ -190,7 +204,7 @@ const definitions: NodeTypeDefinition[] = [
       outputs: clonePorts(createAgentOutputPorts()),
       exits: clonePorts([{}]),
       configured: false,
-      config: createAgentConfig(),
+      config: {},
       configComponent: ConfigAgent,
     }),
   },
@@ -224,7 +238,8 @@ export const PALETTE_GROUPS: PaletteGroup[] = (() => {
   const groups = new Map<NodeCategory, PaletteGroup>();
 
   definitions.forEach((definition) => {
-    if (definition.type === 'new') return;
+    // Correction : Exclusion du 'new' ET du 'start' de la palette
+    if (definition.type === 'new' || definition.type === 'start') return;
 
     const existing = groups.get(definition.category);
     const item: PaletteItem = {
@@ -244,8 +259,5 @@ export const PALETTE_GROUPS: PaletteGroup[] = (() => {
     }
   });
 
-  const order: NodeCategory[] = ['Core' as any, 'Tools' as any, 'Logic' as any, 'Data' as any, 'Agents'];
-
   return Array.from(groups.values());
 })();
-
