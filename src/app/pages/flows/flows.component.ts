@@ -1,8 +1,8 @@
-import { Component, OnInit, inject } from "@angular/core"; // Ajout de OnInit
+import { Component, OnInit, ViewChild, inject } from "@angular/core";
 import { CommonModule } from '@angular/common';
 import { ToastModule } from 'primeng/toast';
 import { Router, RouterOutlet } from "@angular/router";
-import { MessageService } from "primeng/api";
+import { MenuItem, MessageService } from "primeng/api";
 import { ListFlowItemComponent } from "../../components/list-flow-item/list-flow-item.component";
 import { InputTextModule } from "primeng/inputtext";
 import { MultiSelectModule } from "primeng/multiselect";
@@ -10,25 +10,26 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { SelectModule } from "primeng/select";
 import { ApiService } from "../../core/services/api.service";
+import { ContextMenu, ContextMenuModule } from "primeng/contextmenu";
 
-// Définition de l'interface pour correspondre à votre Backend Python
 export interface Flow {
-    id: string; // MongoDB renvoie des string pour les ID
+    id: string;
     name: string;
     description: string;
+    default?: boolean; // Ajout du type
     created_at: string | Date;
     created_by: {
         id: string;
         firstname: string;
         lastname: string;
     };
-    // data?: any; // Optionnel si vous ne l'affichez pas dans la liste
 }
 
 @Component({
     selector: 'app-flows',
-    imports: [CommonModule, FormsModule, ToastModule, RouterOutlet, ListFlowItemComponent, InputTextModule, MultiSelectModule, ButtonModule, SelectModule],
+    imports: [CommonModule, FormsModule, ContextMenuModule, ToastModule, RouterOutlet, ListFlowItemComponent, InputTextModule, MultiSelectModule, ButtonModule, SelectModule],
     template: `
+    <p-contextmenu #cardMenu [model]="cardMenuItems"></p-contextmenu>
     <p-toast />
     <div class="flows__wrapper">
         <div class="flows-search__wrapper">
@@ -60,8 +61,12 @@ export interface Flow {
             <div class="add-flow" (click)="createFlow()">
                 <i class="pi pi-plus"></i>
             </div>
-        
-            <app-list-flow-item *ngFor="let flow of flows" [flow]="flow" (click)="openFlow(flow.id)" />
+            
+            <app-list-flow-item 
+                *ngFor="let flow of flows" 
+                [flow]="flow" 
+                (click)="openFlow(flow.id)"
+                (contextMenu)="onContextMenu($event, flow)" />
             
             <div *ngIf="flows.length === 0" class="no-data">
                 Aucun flux trouvé.
@@ -80,7 +85,7 @@ export interface Flow {
 })
 export class FlowsComponent implements OnInit {
     private router: Router = inject(Router);
-    private apiService: ApiService = inject(ApiService); // Injection du service API
+    private apiService: ApiService = inject(ApiService);
     private messageService: MessageService = inject(MessageService);
 
     public hasActiveRoute = false;
@@ -97,27 +102,35 @@ export class FlowsComponent implements OnInit {
     public filterOnCol: any = null;
     public sortOrder: number = 1;
 
-    // Initialisé à vide, sera rempli par l'API
     public flows: Flow[] = [];
+
+    // Flux actuellement ciblé par le clic droit
+    private selectedFlow: Flow | null = null;
+
+    @ViewChild('cardMenu') cardMenu!: ContextMenu;
+
+    public cardMenuItems: MenuItem[] = [
+        {
+            label: 'Définir comme défaut',
+            icon: 'pi pi-check-circle',
+            command: () => this.setDefaultFlow()
+        },
+        {
+            label: 'Supprimer',
+            icon: 'pi pi-trash',
+            styleClass: 'text-red-500', // Optionnel pour le style
+            command: () => this.deleteFlow()
+        }
+    ];
 
     ngOnInit(): void {
         this.loadFlows();
     }
 
-    /**
-     * Charge la liste des flows depuis le backend
-     */
     public loadFlows(): void {
-        // 'flows' correspond à la fin de l'URL car ApiService ajoute déjà base + '/api'
-        // Si votre routeur Python est 'models/flows', mettez 'models/flows' ici.
-        // Si vous avez enregistré le blueprint avec url_prefix='/api/flows', mettez juste 'flows' ici.
-        // Basé sur votre structure Python précédente, c'était 'models/flows', 
-        // mais si l'URL finale est .../api/flows, alors :
-
         this.apiService.get<Flow[]>('flows/').subscribe({
             next: (data: any) => {
                 this.flows = data;
-                console.log('Flows chargés:', this.flows);
             },
             error: (err: any) => {
                 console.error('Erreur lors du chargement des flows', err);
@@ -138,15 +151,49 @@ export class FlowsComponent implements OnInit {
         this.router.navigate([`/flows/${flowId}`]);
     }
 
+    // Gestion du clic droit
+    public onContextMenu(event: MouseEvent, flow: Flow): void {
+        this.selectedFlow = flow;
+        this.cardMenu.show(event);
+    }
+
+    // Action : Définir par défaut
+    private setDefaultFlow(): void {
+        if (!this.selectedFlow) return;
+
+        this.apiService.post(`flows/${this.selectedFlow.id}/default`, {}).subscribe({
+            next: () => {
+                this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Flux défini par défaut.' });
+                this.loadFlows(); // Recharger pour voir la mise à jour (l'icône orange)
+            },
+            error: () => {
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de définir le flux par défaut.' });
+            }
+        });
+    }
+
+    // Action : Supprimer
+    private deleteFlow(): void {
+        if (!this.selectedFlow) return;
+
+        // Note: Idéalement ajouter une confirmation ici (ConfirmationService)
+        this.apiService.delete(`flows/${this.selectedFlow.id}`).subscribe({
+            next: () => {
+                this.messageService.add({ severity: 'info', summary: 'Supprimé', detail: 'Le flux a été supprimé.' });
+                this.loadFlows();
+            },
+            error: () => {
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de supprimer le flux.' });
+            }
+        });
+    }
+
     onActivate() {
         this.hasActiveRoute = true;
-        // Optionnel : Recharger la liste quand on revient de la vue détail/édition
-        // this.loadFlows(); 
     }
 
     onDeactivate() {
         this.hasActiveRoute = false;
-        // Recharger la liste quand on ferme une route enfant (ex: après une création)
         this.loadFlows();
     }
 }

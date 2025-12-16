@@ -47,7 +47,14 @@ export class AgentsComponent {
       { type: 'number', tooltip: "Ratio d'évaluation", label: "Ratio d'évaluation", key: 'eval_ratio', value: 0.2, required: true, mask: /^0(\.\d+)?|1(\.0+)?$/ },
       { type: 'number', tooltip: 'Nombre d\'époques pour l\'entraînement du modèle', label: 'Époques', key: 'epochs', value: 5, required: true, mask: /^[0-9]+$/ },
       { type: 'select', tooltip: 'Plus le batch size est élevé, plus le traitement est rapide mais nécessite plus de mémoire', label: 'Batch Size', key: 'batch_size', value: 16, required: true, options: [{ label: '4', value: 4 }, { label: '8', value: 8 }, { label: '16', value: 16 }, { label: '32', value: 32 }] },
-      { type: 'select', tooltip: 'Plus le taux d\'apprentissage est élevé, plus le modèle apprend rapidement mais peut devenir instable', label: 'Learning Rate', key: 'learning_rate', value: 5e-5, editable: true, required: true, options: [{ label: '4e-1', value: 4e-1 }, { label: '5e-5', value: 5e-5 }, { label: '5e-6', value: 5e-6 }] }
+      { type: 'select', tooltip: 'Plus le taux d\'apprentissage est élevé, plus le modèle apprend rapidement mais peut devenir instable', label: 'Learning Rate', key: 'learning_rate', value: 5e-5, editable: true, required: true, options: [{ label: '4e-1', value: 4e-1 }, { label: '5e-5', value: 5e-5 }, { label: '5e-6', value: 5e-6 }] },
+      { type: 'select', tooltip: 'Modèle pré-entraîné utilisé comme base pour l\'entraînement', label: 'Modèle de base', key: 'base_model', value: 'cmarkea/distilcamembert-base', required: true,
+        options: [
+          { label: 'distilcamembert-base', value: 'cmarkea/distilcamembert-base' },
+          { label: 'camembert-base', value: 'camembert/camembert-base' },
+          { label: 'camembert-large', value: 'camembert/camembert-large' }
+        ]
+      },
     ]
   };
 
@@ -144,16 +151,16 @@ export class AgentsComponent {
           onAddEndpoint: '/api/datasets/train/{id}',
           onRemoveEndpoint: '/api/datasets/{id}',
           onAddDialog: {
-             component: ConfirmDatasetDialogComponent,
-             header: 'Valider le jeu de données',
-             width: '450px',
-             // Cette fonction est appelée par le KanbanItemComponent au moment du drop
-             resolveData: (item: any) => {
-                return {
-                    // On passe une fonction qui retourne l'observable, comme attendu par votre Dialog
-                    examples: () => this.api.get(`datasets/${item.id}/examples?size=3`)
-                };
-             }
+            component: ConfirmDatasetDialogComponent,
+            header: 'Valider le jeu de données',
+            width: '450px',
+            // Cette fonction est appelée par le KanbanItemComponent au moment du drop
+            resolveData: (item: any) => {
+              return {
+                // On passe une fonction qui retourne l'observable, comme attendu par votre Dialog
+                examples: () => this.api.get(`datasets/${item.id}/examples?size=3`)
+              };
+            }
           }
         },
       ]

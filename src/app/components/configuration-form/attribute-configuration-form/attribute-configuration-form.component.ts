@@ -249,8 +249,10 @@ export class AttributeConfigurationFormComponent {
 
         this.ref?.onClose.subscribe((requirementUpdated: any) => {
             if (requirementUpdated) {
-                if (method === 'add')
+                if (method === 'add') {
+                    if (!attribute.requirements) attribute.requirements = [];
                     attribute.requirements = [...attribute.requirements, requirementUpdated];
+                }
                 else
                     Object.assign(requirement, requirementUpdated);
             }
