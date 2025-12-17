@@ -50,6 +50,7 @@ export class AgentsComponent {
       { type: 'select', tooltip: 'Plus le taux d\'apprentissage est élevé, plus le modèle apprend rapidement mais peut devenir instable', label: 'Learning Rate', key: 'learning_rate', value: 5e-5, editable: true, required: true, options: [{ label: '4e-1', value: 4e-1 }, { label: '5e-5', value: 5e-5 }, { label: '5e-6', value: 5e-6 }] },
       { type: 'select', tooltip: 'Modèle pré-entraîné utilisé comme base pour l\'entraînement', label: 'Modèle de base', key: 'base_model', value: 'cmarkea/distilcamembert-base', required: true,
         options: [
+          { label: 'gliner_multi-v2.1', value: 'urchade/gliner_multi-v2.1' },
           { label: 'distilcamembert-base', value: 'cmarkea/distilcamembert-base' },
           { label: 'camembert-base', value: 'camembert/camembert-base' },
           { label: 'camembert-large', value: 'camembert/camembert-large' }

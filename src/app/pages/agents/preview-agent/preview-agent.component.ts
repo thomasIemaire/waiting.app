@@ -11,12 +11,11 @@ import { ApiService } from "../../../core/services/api.service";
 import { DialogAiAgentComponent } from "../../../components/dialog-ai-agent/dialog-ai-agent.component";
 import { ModelsEventsService } from "../../../core/services/models-events.service";
 import { switchMap, of } from 'rxjs';
-import { DocumentSelectSectionsComponent } from "../../../components/document-select-sections/document-select-sections.component";
 
 @Component({
   selector: 'app-preview-agent',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, InputWLabelComponent, Mapper, ConfigurationFormComponent, DocumentSelectSectionsComponent],
+  imports: [CommonModule, FormsModule, ButtonModule, InputWLabelComponent, Mapper, ConfigurationFormComponent],
   templateUrl: './preview-agent.component.html',
   styleUrls: ['./preview-agent.component.scss'],
   providers: [DialogService, DynamicDialogRef, DynamicDialogConfig]
