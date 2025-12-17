@@ -57,43 +57,51 @@ export class PreviewDocumentGlobalsComponent {
     }
 
     private getDocumentForm(): Form {
+        const analysis = this.data?.analysis;
         return {
             label: 'Informations du document',
             items: [
                 { label: 'Nom', value: this.data?.filename ?? '' },
-                { label: 'Type', value: this.data?.type ?? '', disabled: true }
+                { label: 'Type', value: this.data?.type ?? '', disabled: true },
+                { label: 'Date', value: analysis?.date ?? '', disabled: true },
+                { label: 'Numéro', value: analysis?.order?.number ?? '', disabled: true },
             ]
         };
     }
 
     private getSupplierForm(): Form {
         const analysis = this.data?.analysis;
-        const address = analysis?.from?.address;
+        const seller = analysis?.seller;
+        const address = seller?.address;
         return {
             label: 'Informations du fournisseur',
             items: [
                 { label: 'Nom', value: address?.name ?? '', required: true },
                 { label: 'Rue', value: address?.street ?? '' },
                 { label: 'Ville', value: address?.city ?? '' },
-                { label: 'Code Postal', value: address?.zipcode ?? '' },
+                { label: 'Code Postal', value: address?.zip_code ?? '' },
                 { label: 'Pays', value: address?.country ?? '' },
-                { label: 'TVA Intracommunautaire', value: analysis?.vat?.number ?? '', required: true },
-                { label: 'SIREN', value: analysis?.siren ?? '', required: true, calculated: true },
+                { label: 'TVA Intracommunautaire', value: seller?.vat?.number ?? '', required: true },
+                { label: 'SIREN', value: analysis?.seller?.siren ?? '', required: true, calculated: true },
             ]
         };
     }
 
     private getCustomerForm(): Form {
         const analysis = this.data?.analysis;
-        const address = analysis?.to?.address;
+        const customer = analysis?.customer;
+        const address = customer?.address;
         return {
             label: 'Informations du client',
             items: [
-                { label: 'Nom', value: address?.name ?? '', required: true },
-                { label: 'Rue', value: address?.street ?? '' },
-                { label: 'Ville', value: address?.city ?? '' },
-                { label: 'Code Postal', value: address?.zipcode ?? '' },
-                { label: 'Pays', value: address?.country ?? '' }
+                { label: 'Numéro client', value: customer?.number ?? '' },
+                { label: 'Nom', value: address?.name ?? analysis?.address?.name ?? '', required: true },
+                { label: 'Rue', value: address?.street ?? analysis?.address?.street ?? '' },
+                { label: 'Ville', value: address?.city ?? analysis?.address?.city ?? '' },
+                { label: 'Code Postal', value: address?.zip_code ?? analysis?.address?.zip_code ?? '' },
+                { label: 'Pays', value: address?.country ?? analysis?.address?.country ?? '' },
+                { label: 'TVA Intracommunautaire', value: customer?.vat?.number ?? '', required: true },
+                { label: 'SIREN', value: analysis?.customer?.siren ?? '', required: true, calculated: true },
             ]
         };
     }
