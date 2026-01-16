@@ -368,8 +368,9 @@ export class YoloEditorComponent implements AfterViewInit, OnDestroy {
                 await this.renderTask.cancel();
                 this.renderTask = null;
             }
-
-            const page = await this.pdfDoc.getPage(this.pageIndex);
+            
+            const pageIndex = this.pageIndex + 1;
+            const page = await this.pdfDoc.getPage(pageIndex);
 
             // On calcule l'échelle pour que le PDF tienne dans le conteneur HOST
             // On récupère d'abord la taille "naturelle" du PDF
