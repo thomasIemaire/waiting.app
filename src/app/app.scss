@@ -72,6 +72,7 @@
         overflow: hidden;
 
         >*:not(router-outlet) {
+            display: flex;
             overflow-y: auto;
             overflow-x: hidden;
             height: 100%;

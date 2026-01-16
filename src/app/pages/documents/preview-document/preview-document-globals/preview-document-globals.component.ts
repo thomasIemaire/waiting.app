@@ -57,52 +57,75 @@ export class PreviewDocumentGlobalsComponent {
     }
 
     private getDocumentForm(): Form {
-        const analysis = this.data?.analysis;
+        const analysis = this.data?.analysis?.extracted;
         return {
             label: 'Informations du document',
             items: [
                 { label: 'Nom', value: this.data?.filename ?? '' },
                 { label: 'Type', value: this.data?.type ?? '', disabled: true },
-                { label: 'Date', value: analysis?.date ?? '', disabled: true },
-                { label: 'Numéro', value: analysis?.order?.number ?? '', disabled: true },
+                { label: 'Référence', value: analysis?.document[0]?.number ?? '', disabled: true },
             ]
         };
     }
 
     private getSupplierForm(): Form {
-        const analysis = this.data?.analysis;
+        const analysis = this.data?.analysis?.extracted;
         const seller = analysis?.seller;
         const address = seller?.address;
+        console.log(analysis);
+        
         return {
-            label: 'Informations du fournisseur',
+            label: 'Informations de l\'émetteur',
             items: [
-                { label: 'Nom', value: address?.name ?? '', required: true },
-                { label: 'Rue', value: address?.street ?? '' },
-                { label: 'Ville', value: address?.city ?? '' },
-                { label: 'Code Postal', value: address?.zip_code ?? '' },
-                { label: 'Pays', value: address?.country ?? '' },
-                { label: 'TVA Intracommunautaire', value: seller?.vat?.number ?? '', required: true },
-                { label: 'SIREN', value: analysis?.seller?.siren ?? '', required: true, calculated: true },
+                { label: 'Nom', value: analysis?.seller[0]?.name ?? '' },
+                ...this.getAddressForm(analysis.address_seller[0]).items,
+                ...this.getRegulatoryForm(analysis?.seller[0]).items,
             ]
         };
     }
 
     private getCustomerForm(): Form {
-        const analysis = this.data?.analysis;
+        const analysis = this.data?.analysis?.extracted;
         const customer = analysis?.customer;
         const address = customer?.address;
         return {
-            label: 'Informations du client',
+            label: 'Informations du destinataire',
             items: [
-                { label: 'Numéro client', value: customer?.number ?? '' },
-                { label: 'Nom', value: address?.name ?? analysis?.address?.name ?? '', required: true },
-                { label: 'Rue', value: address?.street ?? analysis?.address?.street ?? '' },
-                { label: 'Ville', value: address?.city ?? analysis?.address?.city ?? '' },
-                { label: 'Code Postal', value: address?.zip_code ?? analysis?.address?.zip_code ?? '' },
-                { label: 'Pays', value: address?.country ?? analysis?.address?.country ?? '' },
-                { label: 'TVA Intracommunautaire', value: customer?.vat?.number ?? '', required: true },
-                { label: 'SIREN', value: analysis?.customer?.siren ?? '', required: true, calculated: true },
+                { label: 'Référence', value: analysis?.customer[0]?.number ?? '' },
+                { label: 'Nom', value: analysis?.buyer[0]?.name ?? '' },
+                ...this.getAddressForm(analysis.address_buyer[0]).items,
+                ...this.getRegulatoryForm(analysis?.buyer[0]).items
             ]
         };
+    }
+
+    private getAddressForm(address: any): Form {
+        return {
+            items: [
+                { label: 'Rue', value: address?.street ?? '' },
+                { label: 'Ville', value: address?.city ?? '' },
+                { label: 'Code Postal', value: address?.zip_code ?? '' },
+                { label: 'Pays', value: address?.country ?? '' },
+            ]
+        }
+    }
+
+    private getRegulatoryForm(company: any): Form {
+        return {
+            items: [
+                { label: 'SIREN', value: company?.siren ?? '', required: true },
+                { label: 'TVA Intracommunautaire', value: company?.tax_id ?? '', required: true },
+            ]
+        }
+    }
+
+    private getContactForm(contact: any): Form {
+        return {
+            items: [
+                { label: 'Nom', value: contact?.name ?? '' },
+                { label: 'Email', value: contact?.email ?? '' },
+                { label: 'Téléphone', value: contact?.phone ?? '' },
+            ]
+        }
     }
 }

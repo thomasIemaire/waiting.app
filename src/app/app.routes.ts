@@ -30,6 +30,11 @@ export const routes: Routes = [
         canActivate: [authGuard]
     },
     {
+        path: 'sardine',
+        loadChildren: () => import('./pages/sardine/sardine.route').then(m => m.sardineRoutes),
+        canActivate: [authGuard, adminGuard]
+    },
+    {
         path: 'agents',
         loadChildren: () => import('./pages/agents/agents.route').then(m => m.agentsRoutes),
         canActivate: [authGuard, adminGuard]

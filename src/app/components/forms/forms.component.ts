@@ -5,6 +5,7 @@ import { FormItem, InputWLabelComponent } from "../input-w-label/input-w-label.c
 
 export interface Form {
   label?: string;
+  columns?: number;
   items: FormItem[];
 }
 
@@ -15,7 +16,7 @@ export interface Form {
   template: `
     <div class="forms__wrapper">
       <div class="forms__label" *ngIf="form.label">{{ form.label }}</div>
-      <div class="forms__group-items">
+      <div class="forms__group-items" [class.grid]="form.columns && form.columns > 1">
         <div *ngFor="let item of form.items" class="forms__item">
           <app-input-w-label
             [type]="item.type ?? 'text'"
