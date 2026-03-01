@@ -2,12 +2,13 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
+import { InputTextModule } from 'primeng/inputtext';
 import { GFlowLink, GFlowNode, GFlowPort, JsonValue } from '../../core/gflow.types';
 import { ApiService } from '../../../../core/services/api.service';
 
 export interface AgentVersion { version: string; map: JsonValue; }
 export interface AgentDefinition { name: string; versions: AgentVersion[]; }
-export interface AgentConfig { agentName: string; version: string; }
+export interface AgentConfig { agentName: string; version: string; root?: string; }
 
 const compareVersions = (a: string, b: string): number => {
   const pa = a.split('.').map(Number);
@@ -23,9 +24,25 @@ const compareVersions = (a: string, b: string): number => {
 
 const cloneJson = <T extends JsonValue>(value: T): T => JSON.parse(JSON.stringify(value));
 
+// Fonction utilitaire pour wrapper la map dans la racine
+const wrapMapInRoot = (map: JsonValue, root: string): JsonValue => {
+  if (!root || !root.trim()) return map;
+  const parts = root.trim().split('.');
+  let current: any = map;
+  // On parcourt en sens inverse pour emboîter
+  for (let i = parts.length - 1; i >= 0; i--) {
+    current = { [parts[i]]: current };
+  }
+  return current;
+};
+
 export const ensureAgentConfig = (node: GFlowNode): AgentConfig => {
-  const cfg = (node.config as AgentConfig | undefined) ?? { agentName: '', version: '' };
-  const normalized: AgentConfig = { agentName: cfg.agentName || '', version: cfg.version || '' };
+  const cfg = (node.config as AgentConfig | undefined) ?? { agentName: '', version: '', root: '' };
+  const normalized: AgentConfig = { 
+    agentName: cfg.agentName || '', 
+    version: cfg.version || '',
+    root: cfg.root || ''
+  };
   node.config = normalized;
   return normalized;
 };
@@ -46,7 +63,7 @@ export const createAgentOutputPorts = (): GFlowPort[] => [{ map: {} }];
 @Component({
   selector: 'app-config-agent',
   standalone: true,
-  imports: [CommonModule, FormsModule, SelectModule],
+  imports: [CommonModule, FormsModule, SelectModule, InputTextModule],
   template: `
   <div class="config-panel">
     <div class="config-line">
@@ -66,6 +83,12 @@ export const createAgentOutputPorts = (): GFlowPort[] => [{ map: {} }];
         (onChange)="onVersionChange($event.value)" [disabled]="!selectedAgentName"
         appendTo="body" [style]="{'width':'100%'}" />
     </div>
+
+    <div class="config-line">
+      <span class="line-label">Racine du résultat (Optionnel)</span>
+      <input pInputText type="text" pSize="small" placeholder="ex: facture.entete" 
+             [(ngModel)]="root" (ngModelChange)="emitConfig()" />
+    </div>
   </div>`,
   styles: [`
     .config-panel { display: flex; flex-direction: column; gap: 1rem; }
@@ -84,6 +107,7 @@ export class ConfigAgent implements OnInit, OnChanges {
   public agents: AgentDefinition[] = [];
   public selectedAgentName = '';
   public selectedVersion = '';
+  public root = '';
 
   ngOnInit() { this.loadAgents(); }
   ngOnChanges(changes: SimpleChanges) { if (changes['node']) this.syncFromNode(); }
@@ -117,6 +141,7 @@ export class ConfigAgent implements OnInit, OnChanges {
     const cfg = ensureAgentConfig(this.node);
     this.selectedAgentName = cfg.agentName;
     this.selectedVersion = cfg.version;
+    this.root = cfg.root || '';
   }
 
   onAgentChange(name: string) {
@@ -130,14 +155,23 @@ export class ConfigAgent implements OnInit, OnChanges {
     this.emitConfig();
   }
 
-  private emitConfig() {
-    const newConfig: AgentConfig = { agentName: this.selectedAgentName, version: this.selectedVersion };
+  public emitConfig() {
+    const newConfig: AgentConfig = { 
+      agentName: this.selectedAgentName, 
+      version: this.selectedVersion,
+      root: this.root
+    };
     this.node.config = newConfig;
     this.node.configured = !!(this.selectedAgentName && this.selectedVersion);
 
     const agentDef = this.agents.find(a => a.name === this.selectedAgentName);
     if (agentDef) {
-      const resolvedMap = resolveMapForVersion(agentDef, this.selectedVersion);
+      // 1. Récupération de la map brute de l'agent
+      let resolvedMap = resolveMapForVersion(agentDef, this.selectedVersion);
+      
+      // 2. Encapsulation dans la racine si définie (ex: "facture.total" -> { facture: { total: { ...map } } })
+      resolvedMap = wrapMapInRoot(resolvedMap, this.root);
+
       if (!this.node.outputs || !this.node.outputs.length) this.node.outputs = [{ map: {} }];
       this.node.outputs[0] = { ...this.node.outputs[0], map: resolvedMap };
     }

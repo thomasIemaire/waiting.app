@@ -5,6 +5,7 @@ import { GFlowLink, GFlowNode, GFlowPort, JsonValue, NodeType, PortRef } from '.
 
 @Injectable()
 export class GflowStateService {
+  // ... (début du fichier inchangé : nodes, links, addNode, etc.) ...
   nodes: GFlowNode[] = [];
   links: GFlowLink[] = [];
 
@@ -158,9 +159,7 @@ export class GflowStateService {
     return newNode;
   }
 
-  // --- CORRECTION MAJEURE ICI ---
   removeGroupEntry(group: GFlowNode, indexToRemove: number) {
-    // 1. Supprimer les liens connectés exactement à ce port (entry index)
     this.links = this.links.filter(
       (link) =>
         !(
@@ -171,8 +170,6 @@ export class GflowStateService {
         ),
     );
 
-    // 2. Décaler les index des liens connectés aux ports SUIVANTS (index > indexToRemove)
-    // Sinon, le lien pointera vers le mauvais slot après la suppression dans le tableau
     this.links.forEach((link) => {
       if (
         link.relation === 'entry-exit' &&
@@ -184,12 +181,10 @@ export class GflowStateService {
       }
     });
 
-    // 3. Supprimer l'entrée du tableau du nœud
     if (group.entries) {
       group.entries.splice(indexToRemove, 1);
     }
 
-    // 4. Recalculer les maps
     this.recomputeDownstreamFrom(group.id);
   }
 
@@ -331,6 +326,7 @@ export class GflowStateService {
     return this.cloneJson(node.outputs?.[outIdx]?.map ?? {});
   }
 
+  // --- MODIFICATION ICI : Encapsulation si root est défini sur le groupe ---
   private effectiveOutputMap(nodeId: string, outIdx: number): JsonValue {
     const node = this.findNode(nodeId);
     if (!node) {
@@ -340,12 +336,27 @@ export class GflowStateService {
     if (node.type === 'agent-group') {
       const incoming = this.aggregateIncomingMap(nodeId);
       const children = this.aggregatedChildrenMapForGroup(nodeId);
-      return this.mergeJson(incoming, children);
+      const merged = this.mergeJson(incoming, children);
+
+      // Application de la racine si présente
+      const root = (node.config as any)?.root;
+      return root ? this.wrapMapInRoot(merged, root) : merged;
     }
 
     const incoming = this.aggregateIncomingMap(nodeId);
     const own = this.nodeOutputOwnMap(nodeId, outIdx);
     return this.mergeJson(incoming, own);
+  }
+
+  // Nouvelle méthode utilitaire
+  private wrapMapInRoot(map: JsonValue, root: string): JsonValue {
+    if (!root || !root.trim()) return map;
+    const parts = root.trim().split('.');
+    let current: any = map;
+    for (let i = parts.length - 1; i >= 0; i--) {
+      current = { [parts[i]]: current };
+    }
+    return current;
   }
 
   private mergeJson(a: JsonValue, b: JsonValue): JsonValue {

@@ -34,6 +34,15 @@ import { ConstantConfigurationFormComponent } from "./constant-configuration-for
     providers: [DialogService]
 })
 export class ConfigurationFormComponent implements OnInit {
+    private readonly DEFAULT_CONFIGURATION: any = {
+        name: '',
+        description: '',
+        attributes: [],
+        formats: [],
+        constants: [],
+        negative_configurations: []
+    };
+
     @Input() public dialog: boolean = false;
     @Input() public rootKeys: string = "";
     @Input() public keys: string[] = [];
@@ -114,20 +123,21 @@ export class ConfigurationFormComponent implements OnInit {
     }
 
     public createConfiguration(): void {
-        this.configuration = {
-            name: '',
-            description: '',
-            attributes: [],
-            formats: []
-        };
+        this.configuration = this.DEFAULT_CONFIGURATION;
         this.showForm = true;
         this.newForm = true;
         this.configurationChange.emit(this.configuration);
     }
 
-    // NOUVEAU : Méthode pour sauvegarder depuis la modale
     public save(): void {
         if (!this.configuration.name) return; // Validation basique
+
+        // Force la frequence à être un nombre
+        if (this.configuration.attributes && Array.isArray(this.configuration.attributes)) {
+            this.configuration.attributes = this.configuration.attributes.map((attr: any) => {
+                return { ...attr, frequency: Number(attr.frequency) };
+            });
+        }
 
         let request$;
         if (this.configuration._id || this.configuration.id) {
@@ -146,10 +156,19 @@ export class ConfigurationFormComponent implements OnInit {
     }
 
     private ensureStructure(): void {
-        if (!this.configuration) this.configuration = {};
-        if (!this.configuration.attributes) this.configuration.attributes = [];
-        if (!this.configuration.formats) this.configuration.formats = [];
-        if (!this.configuration.negative_configurations) this.configuration.negative_configurations = [];
+        // CORRECTION : On fusionne les défauts DANS l'objet existant pour garder la référence
+        const merged = { ...this.DEFAULT_CONFIGURATION, ...this.configuration };
+        Object.assign(this.configuration, merged);
+
+        // Le reste de votre logique pour les configurations négatives
+        if (Array.isArray(this.configuration.negative_configurations)) {
+            this.configuration.negative_configurations = this.configuration.negative_configurations.map((item: any) => {
+                if (typeof item === 'object' && item !== null) {
+                    return item._id || item.id || item.value;
+                }
+                return item;
+            });
+        }
     }
 
     public addAttribute(): void {
@@ -160,7 +179,8 @@ export class ConfigurationFormComponent implements OnInit {
                 type: '',
                 rule: '',
                 parameters: { regex: '' }
-            }
+            },
+            requirements: []
         });
     }
 
@@ -197,6 +217,8 @@ export class ConfigurationFormComponent implements OnInit {
     }
 
     public addConstant(): void {
+        console.log(this.configuration);
+        
         if (!this.configuration.constants) this.configuration.constants = [];
         this.configuration.constants.push({
             key: '',
@@ -244,28 +266,8 @@ export class ConfigurationFormComponent implements OnInit {
         this.usingKeysChange.emit(this.usingKeys);
     }
 
-    private _cachedNegativeConfigs: any[] = [];
-    private _lastAllConfigs: any[] | undefined; // Autoriser undefined
-    private _lastConfigId: string | null = null;
-
     get availableNegativeConfigurations(): any[] {
-        // 1. On récupère la référence brute du service (sans || [])
-        const allConfigs = this.modelConfigurationService.configurations;
         const currentId = this.configurationId || this.configuration?._id || this.configuration?.id;
-
-        // 2. Comparaison stricte : si c'est undefined les deux fois, c'est égal.
-        if (allConfigs === this._lastAllConfigs && currentId === this._lastConfigId) {
-            return this._cachedNegativeConfigs;
-        }
-
-        // 3. Mise à jour des références pour la prochaine fois
-        this._lastAllConfigs = allConfigs;
-        this._lastConfigId = currentId;
-
-        // 4. On crée le tableau filtré seulement maintenant (avec sécurité || [])
-        const source = allConfigs || [];
-        this._cachedNegativeConfigs = source.filter((c: any) => c.value !== currentId);
-
-        return this._cachedNegativeConfigs;
+        return (this.modelConfigurationService.configurations || []).filter((c: any) => c.value !== currentId);
     }
 }

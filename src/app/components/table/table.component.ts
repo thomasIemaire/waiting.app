@@ -4,6 +4,7 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { TableModule } from "primeng/table";
 import { MultiSelectModule } from 'primeng/multiselect';
 import { InputTextModule } from 'primeng/inputtext';
+import { TagModule } from "primeng/tag";
 
 export interface Column {
     field: string;
@@ -13,7 +14,7 @@ export interface Column {
 
 @Component({
     selector: 'app-table',
-    imports: [CommonModule, FormsModule, TableModule, MultiSelectModule, InputTextModule],
+    imports: [CommonModule, FormsModule, TableModule, MultiSelectModule, InputTextModule, TagModule],
     templateUrl: './table.component.html',
     styleUrls: ['./table.component.scss'],
 })
@@ -61,5 +62,9 @@ export class TableComponent {
 
     public onSelectionChange(selectedRow: any): void {
         this.selectionChange.emit(selectedRow);
+    }
+
+    public dataIsObject(data: any): boolean {
+        return !(data instanceof Date) && data instanceof Object;
     }
 }

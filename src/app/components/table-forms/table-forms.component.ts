@@ -31,6 +31,11 @@ export interface TableFormRow {
                     </tr>
                 </thead>
                 <tbody>
+                    @if (form.rows.length === 0) {
+                    <tr>
+                        <td [attr.colspan]="cols.length" class="table-forms__no-data">Aucune donnée</td>
+                    </tr>
+                    } @else {
                     <tr *ngFor="let row of form.rows; let i = index">
                         <p-button variant="text" severity="secondary" size="small" [label]="(i + 1).toString()" />
                         <td *ngFor="let col of form.cols">
@@ -44,6 +49,7 @@ export interface TableFormRow {
                         </td>
                         <p-button variant="text" severity="danger" size="small" icon="pi pi-minus" (onClick)="removeLine(row)" pTooltip="Supprimer la ligne" tooltipPosition="left" />
                     </tr>
+                    }
                 </tbody>
             </table>
             <p-button variant="text" severity="secondary" size="small" label="Ajouter une ligne" icon="pi pi-plus" (onClick)="addLine()" />

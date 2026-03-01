@@ -1,10 +1,12 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms'; // Ajout
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext'; // Ajout
 import { GFlowLink, GFlowNode, JsonValue } from '../../core/gflow.types';
 
-export interface AgentGroupConfig { map: Record<string, unknown>; ids: string[]; }
-export const createAgentGroupConfig = (): AgentGroupConfig => ({ map: {}, ids: [] });
+export interface AgentGroupConfig { map: Record<string, unknown>; ids: string[]; root?: string; }
+export const createAgentGroupConfig = (): AgentGroupConfig => ({ map: {}, ids: [], root: '' });
 
 const isAgentGroupConfig = (value: unknown): value is AgentGroupConfig =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -17,6 +19,7 @@ export const ensureAgentGroupConfig = (node: GFlowNode): AgentGroupConfig => {
   const normalized = node.config as AgentGroupConfig;
   normalized.map ??= {};
   normalized.ids ??= [];
+  normalized.root ??= ''; // Init root
   return normalized;
 };
 
@@ -24,7 +27,8 @@ export const updateAgentGroupConfig = (node: GFlowNode, updates: Partial<AgentGr
   const cfg = ensureAgentGroupConfig(node);
   if (updates.map) cfg.map = cloneMap(updates.map);
   if (updates.ids) cfg.ids = [...updates.ids];
-  return { map: cloneMap(cfg.map), ids: [...cfg.ids] };
+  if (updates.root !== undefined) cfg.root = updates.root; // Update root
+  return { map: cloneMap(cfg.map), ids: [...cfg.ids], root: cfg.root };
 };
 
 interface AgentGroupRow { agent: GFlowNode | null; index: number; }
@@ -32,10 +36,16 @@ interface AgentGroupRow { agent: GFlowNode | null; index: number; }
 @Component({
   selector: 'app-config-agent-group',
   standalone: true,
-  imports: [CommonModule, ButtonModule],
+  imports: [CommonModule, ButtonModule, FormsModule, InputTextModule], // Ajout imports
   template: `
   <div class="config-panel">
-    <div class="block-header">
+    <div class="config-line">
+      <span class="line-label">Racine du résultat (Optionnel)</span>
+      <input pInputText type="text" pSize="small" placeholder="ex: global.extraction" 
+             [(ngModel)]="root" (ngModelChange)="onRootChange()" style="width: 100%" />
+    </div>
+
+    <div class="block-header" style="margin-top: 1rem;">
       <span class="block-label">Agents connectés</span>
     </div>
 
@@ -67,6 +77,8 @@ interface AgentGroupRow { agent: GFlowNode | null; index: number; }
   `,
   styles: [`
     .config-panel { display: flex; flex-direction: column; gap: 0.5rem; }
+    .config-line { display: flex; flex-direction: column; gap: 0.25rem; }
+    .line-label { font-weight: 500; font-size: 0.875rem; color: var(--p-text-color); }
     .block-header { margin-bottom: 0.25rem; }
     .block-label { font-weight: 700; font-size: 0.9rem; color: var(--p-text-color); }
 
@@ -104,6 +116,7 @@ export class ConfigAgentGroup implements OnInit, OnChanges {
   @Output() configChange = new EventEmitter<unknown>();
 
   public view: AgentGroupRow[] = [];
+  public root: string = ''; // Local root state
 
   ngOnInit() { this.refresh(); }
   ngOnChanges(_c: SimpleChanges) { this.refresh(); }
@@ -119,13 +132,22 @@ export class ConfigAgentGroup implements OnInit, OnChanges {
     this.configChange.emit({ type: 'entry-removed', index: i });
   }
 
-  // Correction : Ajout de la fonction trackBy
   trackByFn(index: number, item: AgentGroupRow) {
-    return index; // L'index est suffisant ici car l'ordre importe et c'est une liste simple
+    return index;
+  }
+
+  onRootChange() {
+    updateAgentGroupConfig(this.node, { root: this.root });
+    this.configChange.emit({ type: 'root-changed' });
   }
 
   private refresh() {
     if (!this.node) return;
+    
+    // Sync root
+    const cfg = ensureAgentGroupConfig(this.node);
+    this.root = cfg.root || '';
+
     const cnt = this.node.entries?.length ?? 0;
     const children: string[] = [];
 

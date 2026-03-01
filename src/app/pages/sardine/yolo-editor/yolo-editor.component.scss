@@ -1,0 +1,239 @@
+.yolo-editor__wrapper {
+    display: flex;
+    height: 100%;
+    width: 100%;
+
+    // Centrer le Drag & Drop
+    .yolo-editor__empty-state {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--padding-xl, 2rem);
+
+        // Limiter la taille du composant DND pour qu'il ne prenne pas tout l'écran bêtement
+        app-dnd-file {
+            width: 100%;
+            max-width: 600px;
+        }
+    }
+
+    .yolo-editor__content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-m);
+        overflow: hidden; // Important pour contenir le canvas
+    }
+
+    // ... (Reste du CSS tools inchangé)
+    .yolo-editor__tools {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        div {
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap-m);
+        }
+    }
+}
+
+// ... Header CSS inchangé ...
+.yolo-editor__content-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.yolo-editor__header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+    min-width: 0;
+}
+
+.yolo-editor__classification {
+    font-family: "Poppins", sans-serif;
+    font-size: 1rem;
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+    outline: none;
+}
+
+.yolo-editor__path {
+    min-width: 0;
+    font-size: .875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* === CORRECTION MAJEURE ICI === */
+.yolo-editor__canvas {
+    flex: 1;
+    /* Prend l'espace restant */
+    min-height: 0;
+    /* Permet au flex item de rétrécir */
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.yolo-editor__page {
+    position: relative;
+
+    /* LOGIQUE DE REDIMENSIONNEMENT : 
+       On veut que la page tienne entièrement dans l'écran sans scroll (contain).
+    */
+    height: 100%;
+    /* Essaie de prendre toute la hauteur */
+    width: auto;
+    /* La largeur s'adapte selon le ratio */
+    aspect-ratio: 1 / 1.4142;
+    /* Ratio A4 standard */
+
+    max-width: 100%;
+    /* Mais ne jamais dépasser la largeur dispo */
+    /* Si on touche max-width, l'aspect-ratio réduira la hauteur automatiquement */
+}
+
+.yolo-editor__page-canvas,
+.yolo-editor__overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%; // Force le canvas à remplir le conteneur .page
+    height: 100%;
+}
+
+.yolo-editor__page-canvas {
+    pointer-events: none;
+    background-color: white; // Assure que la "feuille" est blanche
+}
+
+.yolo-editor__overlay {
+    touch-action: none;
+    cursor: crosshair;
+}
+
+// Footer CSS inchangé
+.yolo-editor__content-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-m);
+}
+
+.yolo-editor__pagination {
+    font-weight: 400;
+    font-size: .75rem;
+    color: var(--p-text-muted-color);
+}
+
+.yolo-editor__layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    /* LAISSE PASSER les clics vers le canvas pour pouvoir dessiner par dessus */
+    overflow: hidden;
+}
+
+/* La zone individuelle */
+.yolo-zone {
+    --zone-bg-color: rgba(239, 68, 68, 0.1);
+    --zone-border-color: var(--red-500, #ef4444);
+    --zone-hover-bg-color: rgba(239, 68, 68, 0.4);
+
+    &.table {
+        --zone-bg-color: rgba(59, 130, 246, 0.1);
+        --zone-border-color: var(--blue-500, #3b82f6);
+        --zone-hover-bg-color: rgba(59, 130, 246, 0.4);
+    }
+
+    &.picture {
+        --zone-bg-color: rgba(34, 197, 94, 0.1);
+        --zone-border-color: var(--green-500, #22c55e);
+        --zone-hover-bg-color: rgba(34, 197, 94, 0.4);
+    }
+
+    position: absolute;
+    border: 2px solid var(--zone-border-color);
+    background-color: var(--zone-bg-color);
+    pointer-events: auto;
+    /* IMPORTANT: Réactive les clics sur la zone elle-même (pour le select et la gomme) */
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    /* Changement de curseur si on est en mode gomme */
+    &.is-delete-mode {
+        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="red" d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>'), auto;
+
+        &:hover {
+            background-color: var(--zone-hover-bg-color);
+        }
+    }
+    
+    &:hover {
+        .yolo-zone__type,
+        .yolo-zone__author {
+            display: block;
+        }
+    }
+}
+
+/* Le menu déroulant */
+.yolo-zone__type {
+    display: none;
+    cursor: pointer;
+    pointer-events: auto;
+    background-color: var(--zone-border-color);
+    color: white;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: absolute;
+    bottom: 100%;
+    right: -2px;
+}
+
+/* Le badge auteur */
+.yolo-zone__author {
+    display: none;
+    background-color: var(--zone-border-color);
+    color: white;
+    font-size: .75rem;
+    padding: var(--padding-s) var(--padding-m);
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: absolute;
+    top: 100%;
+    left: -2px;
+}
+
+::ng-deep {
+    .yolo-zone__type p-select {
+        font-family: "Poppins", sans-serif;
+        font-size: .875rem;
+        background-color: transparent;
+        box-shadow: none;
+        border: none;
+        outline: none;
+
+        .p-select-label,
+        .p-select-dropdown {
+            color: #fff;
+            font-size: .75rem;
+        }
+    }
+}

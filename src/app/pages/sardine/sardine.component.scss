@@ -1,0 +1,22 @@
+.sardine__wrapper {
+    width: 100%;
+    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 1fr;
+    grid-column-gap: var(--gap-l);
+
+    app-files-explorer {
+        min-height: 0;
+        grid-area: 1 / 1 / 2 / 2;
+        height: 100%;
+    }
+
+    app-yolo-editor {
+        min-height: 0;
+        grid-area: 1 / 2 / 2 / 5;
+        height: 100%;
+    }
+}

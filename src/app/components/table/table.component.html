@@ -25,7 +25,11 @@
             <ng-template #body let-searchData>
                 <tr [pSelectableRow]="searchData">
                     <td *ngFor="let col of cols">
-                        {{ searchData[col.field] }}
+                        @if (dataIsObject(searchData[col.field])) {
+                            <p-tag [severity]="searchData[col.field]?.severity" [value]="searchData[col.field]?.label" />
+                        } @else {
+                            {{ searchData[col.field] }}
+                        }
                     </td>
                 </tr>
             </ng-template>

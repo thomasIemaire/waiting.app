@@ -1,15 +1,15 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, Input } from "@angular/core";
+import { Component, EventEmitter, inject, Input, Output } from "@angular/core";
 import { UserService } from "../../core/services/user.service";
 
 @Component({
     selector: 'app-list-flow-item',
     imports: [CommonModule],
     template: `
-    <div class="list-flow-item__container">
+    <div class="list-flow-item__container" (contextmenu)="onRightClick($event)">
         <div class="list-flow-item__wrapper">
             <div class="list-flow-item__header">
-                <div *ngIf="flow.default || true" class="list-flow-item__header-icon orange">
+                <div *ngIf="flow.default" class="list-flow-item__header-icon orange">
                     <i class="fa-regular fa-circle-dot"></i>
                 </div>
                 <div class="list-flow-item__header-icon">
@@ -43,6 +43,12 @@ import { UserService } from "../../core/services/user.service";
 })
 export class ListFlowItemComponent {
     @Input() flow: any;
+    @Output() contextMenu = new EventEmitter<MouseEvent>();
 
     public userService: UserService = inject(UserService);
+
+    onRightClick(event: MouseEvent): void {
+        event.preventDefault();
+        this.contextMenu.emit(event);
+    }
 }

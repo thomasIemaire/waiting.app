@@ -84,6 +84,11 @@ export class SidebarComponent {
         label: 'Administration',
         items: [
             {
+                label: 'Sardine',
+                icon: 'fa-regular fa-file-lines',
+                link: '/sardine'
+            },
+            {
                 label: 'Agents',
                 icon: 'pi pi-microchip-ai',
                 link: '/agents'

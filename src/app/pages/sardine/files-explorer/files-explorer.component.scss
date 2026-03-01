@@ -1,0 +1,115 @@
+.files-explorer__container {
+    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: var(--padding-l);
+    border-radius: var(--radius-l);
+    background-color: var(--background-color-100);
+    box-shadow: 0 0 0 0 var(--background-color-200);
+
+    .files-explorer__wrapper {
+        height: 100%;
+        width: 100%;
+        border-radius: var(--radius-m);
+        background-color: var(--background-color-50);
+        border: 1px solid var(--background-color-300);
+        padding: var(--padding-l);
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-m);
+
+        .files-explorer-header__title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+    }
+}
+
+.files-explorer-content__wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-m);
+
+    .content-dataset-section__wrapper,
+    .content-add-section__wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-s);
+
+        .content-section__title {
+            font-weight: 500;
+            font-size: .875rem;
+            color: var(--p-text-muted-color);
+        }
+
+        .content-add-section__add {
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-m);
+            border: 1px dashed var(--background-color-300);
+            color: var(--background-color-300);
+            font-size: .875rem;
+            cursor: pointer;
+        }
+
+        .content-dataset-section__files-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap-s);
+
+            .file-item__wrapper {
+                .file-item__group {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--gap-m);
+                    padding: var(--padding-s) var(--padding-m);
+                    border-radius: var(--radius-s);
+
+                    i {
+                        font-size: .75rem;
+                    }
+
+                    font-size: .875rem;
+                    font-weight: 500;
+
+                    cursor: pointer;
+                    user-select: none;
+
+                    &:hover {
+                        background-color: var(--background-color-100);
+                    }
+
+                    .file-item__group-name {
+                        flex: 1;
+                    }
+                }
+
+                .files-explorer-content__details-wrapper {
+                    border-left: 1px solid var(--background-color-300);
+
+                    .file-item__details {
+                        font-size: .75rem;
+                        color: var(--p-text-muted-color);
+                        padding: var(--padding-s) var(--padding-m);
+                        border-radius: 0 var(--radius-s) var(--radius-s) 0;
+                        cursor: pointer;
+
+                        &:hover {
+                            background-color: var(--background-color-100);
+
+                            .file-item__name {
+                                color: var(--p-text-color);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

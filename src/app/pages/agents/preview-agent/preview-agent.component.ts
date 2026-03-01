@@ -11,12 +11,11 @@ import { ApiService } from "../../../core/services/api.service";
 import { DialogAiAgentComponent } from "../../../components/dialog-ai-agent/dialog-ai-agent.component";
 import { ModelsEventsService } from "../../../core/services/models-events.service";
 import { switchMap, of } from 'rxjs';
-import { DocumentSelectSectionsComponent } from "../../../components/document-select-sections/document-select-sections.component";
 
 @Component({
   selector: 'app-preview-agent',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, InputWLabelComponent, Mapper, ConfigurationFormComponent, DocumentSelectSectionsComponent],
+  imports: [CommonModule, FormsModule, ButtonModule, InputWLabelComponent, Mapper, ConfigurationFormComponent],
   templateUrl: './preview-agent.component.html',
   styleUrls: ['./preview-agent.component.scss'],
   providers: [DialogService, DynamicDialogRef, DynamicDialogConfig]
@@ -35,7 +34,7 @@ export class PreviewAgentComponent implements OnInit {
   // Modèle par défaut pour un nouvel agent
   private readonly DEFAULT_MODEL = {
     id: null,
-    name: 'Modèle d\'agent',
+    name: '',
     reference: '',
     description: '',
     mapper: {}
@@ -138,6 +137,13 @@ export class PreviewAgentComponent implements OnInit {
     if (!this.configuration) {
       this.saveModel(null);
       return;
+    }
+
+    // Force la fréquence des attributs à être un nombre
+    if (this.configuration.attributes && Array.isArray(this.configuration.attributes)) {
+      this.configuration.attributes = this.configuration.attributes.map((attr: any) => {
+        return { ...attr, frequency: Number(attr.frequency) };
+      });
     }
 
     // Sinon, on sauvegarde d'abord la configuration
