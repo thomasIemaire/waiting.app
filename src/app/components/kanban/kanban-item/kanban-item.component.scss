@@ -5,15 +5,18 @@
     padding: var(--padding-l);
     border-radius: var(--radius-l);
     background-color: var(--background-color-100);
+    box-shadow: 0 0 0 0rem var(--background-color-200);
 
     &.kanban-board-item__container.is-drag-over-allowed .kanban-board-item__wrapper {
-        border-color: var(--p-primary-500);
-        background-color: var(--background-color-200);
+        transition: all 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+        box-shadow: 0 0 0 1rem var(--success-color-100);
+        border-color: var(--p-green-500);
     }
 
     &.kanban-board-item__container.is-drag-over-forbidden .kanban-board-item__wrapper {
-        border-color: var(--background-color-500);
-        background-color: var(--background-color-200);
+        transition: all 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+        box-shadow: 0 0 0 1rem var(--danger-color-100);
+        border-color: var(--p-red-500);
     }
 
     .kanban-board-item__wrapper {
@@ -44,9 +47,13 @@
                 display: flex;
                 flex-direction: column;
                 gap: var(--gap-s);
-                flex: 1 1 auto;
-                min-height: 0;
-                overflow-y: auto;
+                height: auto;
+
+                &:last-child {
+                    flex: 1 1 auto;
+                    min-height: 0;
+                    overflow-y: auto;
+                }
 
                 .kanban-board-item-section__header {
                     display: flex;
@@ -61,7 +68,7 @@
 
                     .kanban-board-item-section__add {
                         width: 100%;
-                        height: 32px;
+                        height: 40px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -82,8 +89,14 @@
                     gap: var(--gap-s);
 
                     .kanban-card {
+                        transition: transform 0.2s ease;
+
                         &.is-draggable {
                             cursor: grab;
+                        }
+
+                        &:hover {
+                            transform: scale(0.98);
                         }
                     }
                 }

@@ -1,0 +1,127 @@
+.flows__wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-l);
+
+    .flows-search__wrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: var(--gap-m);
+        text-wrap: nowrap;
+        font-size: .875rem;
+
+        p-multiselect,
+        p-select {
+            min-width: 256px;
+            max-width: 256px;
+        }
+    }
+}
+
+.list-flows {
+    display: grid;
+    min-height: 174.6px;
+    grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+    gap: var(--gap-l); 
+    width: 100%;
+    justify-items: center;
+    align-items: center;
+}
+
+.add-flow, 
+app-list-flow-item {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.add-flow {
+    width: 50%;
+    height: 50%;
+    border: 1px dashed var(--background-color-300);
+    color: var(--background-color-300);
+    border-radius: var(--radius-l);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .875rem;
+    cursor: pointer;
+}
+
+.display-preview-flow {
+    --spacing-top: calc(var(--height-static-header) + 2 * var(--padding-l));
+    --spacing-left: calc(var(--width-expanded-sidebar) + 2 * var(--padding-l));
+
+    position: absolute;
+    background-color: var(--background-color-50);
+    height: calc(100dvh - var(--spacing-top) - var(--padding-l));
+    width: calc(100dvw - var(--spacing-left) - var(--padding-l));
+    top: var(--spacing-top);
+    left: var(--spacing-left);
+    z-index: -1;
+
+    transition: height .3s ease-in-out, width .3s ease-in-out, top .3s ease-in-out, left .3s ease-in-out, background-color .5s ease-in-out;
+
+    &.open {
+        background-color: var(--background-color-200);
+        height: 100dvh;
+        width: 100dvw;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
+}
+
+.router-outlet__wrapper {
+    --spacing-top: calc(var(--height-static-header) + 2 * var(--padding-l));
+    --spacing-left: calc(var(--width-expanded-sidebar) + 2 * var(--padding-l));
+    --margin-right: var(--padding-l);
+    --margin-bottom: var(--padding-l);
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 50;
+
+    overflow: hidden;
+
+    >*:not(router-outlet) {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    &.active {
+        pointer-events: auto;
+        background-color: var(--background-color-50);
+        animation: expandFromLayout .5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes expandFromLayout {
+        0% {
+            opacity: 0;
+            top: var(--spacing-top);
+            left: var(--spacing-left);
+            width: calc(100vw - var(--spacing-left) - var(--margin-right));
+            height: calc(100vh - var(--spacing-top) - var(--margin-bottom));
+            border-radius: 16px;
+        }
+
+        100% {
+            opacity: 1;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+        }
+    }
+}

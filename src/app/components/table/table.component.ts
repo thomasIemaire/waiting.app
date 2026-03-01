@@ -41,6 +41,11 @@ export class TableComponent {
         this.searchData = this.data;
     }
 
+    ngOnChanges() {
+        this.searchOnlyCols = this.cols;
+        this.searchData = this.data;
+    }
+
     public onSearchChange(): void {
         if (this.search.trim() === '') {
             this.searchData = this.data;

@@ -1,65 +1,145 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input } from "@angular/core";
+import { Component, Input, Output, EventEmitter } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ButtonModule } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
 import { Tooltip } from "primeng/tooltip";
-import { PasswordModule } from 'primeng/password';
+import { PasswordModule } from "primeng/password";
+import { AutoFocusModule } from 'primeng/autofocus';
+import { InputMaskModule } from 'primeng/inputmask';
+import { KeyFilterModule, KeyFilterPattern } from 'primeng/keyfilter';
+import { SelectModule } from 'primeng/select'; // <-- Import ajouté
+import { PdfTargetInputDirective } from "../../core/directives/pdf-target-input.directive";
 
 export interface FormItem {
-    type?: string;
-    label?: string;
-    value: any;
-    required?: boolean;
-    disabled?: boolean;
-    calculated?: boolean;
+  type?: string;
+  label?: string;
+  key?: string;
+  value: any;
+  required?: boolean;
+  recommended?: boolean;
+  tooltip?: string;
+  disabled?: boolean;
+  ok?: boolean;
+  calculated?: boolean;
+  autofocus?: boolean;
+  mask?: RegExp | KeyFilterPattern | null;
+  // Nouveaux champs pour le select
+  options?: any[];
+  editable?: boolean;
 }
 
 @Component({
-    selector: 'app-input-w-label',
-    imports: [CommonModule, FormsModule, InputTextModule, Tooltip, ButtonModule, PasswordModule],
-    template: `
-    <div class="input-w-label__item-label">{{ label }}<span *ngIf="required" class="required-indicator">*</span></div>
-    <div class="input-w-label__item-input">
-        @switch (type) {
-            @case('password') {
-                <p-password [(ngModel)]="value" [feedback]="false" size="small" fluid [disabled]="disabled" [placeholder]="label ? label : ''" [toggleMask]="true" />
-            }
-            @default {
-                <input pInputText [(ngModel)]="value" [type]="type" pSize="small" fluid [disabled]="disabled" [placeholder]="label ? label : ''" />
-            }
-        }
-        <p-button text severity="secondary" size="small" icon="pi pi-sparkles" *ngIf="calculated" pTooltip="Valeur interprétée" tooltipPosition="left"></p-button>
+  selector: "app-input-w-label",
+  // Ajout de SelectModule dans les imports
+  imports: [CommonModule, FormsModule, PdfTargetInputDirective, InputTextModule, Tooltip, ButtonModule, PasswordModule, AutoFocusModule, InputMaskModule, KeyFilterModule, SelectModule],
+  standalone: true,
+  template: `
+    <div class="input-label">
+      <div>{{ label }}<span *ngIf="required" class="required-indicator">*</span></div>
+      <i *ngIf="tooltip" class="pi pi-info-circle" [pTooltip]="tooltip" tooltipPosition="right"></i>
     </div>
-    `,
-    styles: `
-    .input-w-label__item-label {
-        font-size: 0.75rem;
-    }
 
-    .input-w-label__item-input {
-        display: flex;
-        align-items: center;
-        gap: var(--gap-s);
-    }
-    `
+    <div class="input-w-label__item-input">
+      @switch (type) {
+        @case('password') {
+          <p-password
+            [(ngModel)]="value"
+            (ngModelChange)="valueChange.emit($event)"
+            (onBlur)="onBlur()"
+            [feedback]="false"
+            size="small"
+            fluid
+            [disabled]="disabled"
+            [placeholder]="label ? label : ''"
+            [toggleMask]="true"
+            [style.border]="borderStyle"
+            [pAutoFocus]="autofocus"
+          />
+        }
+        @case('select') {
+            <p-select 
+                [(ngModel)]="value"
+                (ngModelChange)="valueChange.emit($event)"
+                [options]="options"
+                [editable]="editable"
+                optionLabel="label"
+                optionValue="value"
+                size="small"
+                [placeholder]="label"
+                fluid
+                appendTo="body"
+                [disabled]="disabled"
+                [style.border]="borderStyle"
+            />
+        }
+        @default {
+          <input
+            pInputText
+            [(ngModel)]="value"
+            (ngModelChange)="valueChange.emit($event)"
+            (blur)="onBlur()"
+            [type]="type"
+            pSize="small"
+            fluid
+            [disabled]="disabled"
+            [placeholder]="label ? label : ''"
+            [style.border]="borderStyle"
+            [pAutoFocus]="autofocus"
+            [pKeyFilter]="mask"
+            pdfTargetInput 
+          />
+        }
+      }
+
+      <p-button
+        text
+        severity="secondary"
+        size="small"
+        icon="pi pi-question-circle"
+        *ngIf="calculated"
+        pTooltip="Valeur interprétée"
+        tooltipPosition="left">
+      </p-button>
+    </div>
+  `,
+  styles: [`
+    .input-w-label__item-input { display: flex; align-items: center; gap: var(--gap-s); }
+  `]
 })
 export class InputWLabelComponent {
-    @Input()
-    public type?: string = 'text';
+  @Input() type: string = 'text';
+  @Input() label: string = '';
+  @Input() value: any = '';
+  @Input() required: boolean = false;
+  @Input() recommended: boolean = false;
+  @Input() tooltip?: string;
+  @Input() disabled: boolean = false;
+  @Input() ok: boolean = false;
+  @Input() calculated: boolean = false;
+  @Input() autofocus: boolean = false;
+  @Input() mask: RegExp | KeyFilterPattern | null = null;
 
-    @Input()
-    public label: string = '';
+  // Nouveaux Inputs
+  @Input() options: any[] = [];
+  @Input() editable: boolean = false;
 
-    @Input()
-    public value: any = '';
+  @Output() valueChange = new EventEmitter<any>();
+  @Output() blur = new EventEmitter<any>();
 
-    @Input()
-    public required: boolean = false;
+  private get isEmpty(): boolean {
+    return this.value === null || this.value === undefined || this.value === '';
+  }
 
-    @Input()
-    public disabled: boolean = false;
+  public get borderStyle(): string {
+    if (this.ok) return '1px solid var(--p-green-500)';
+    if (!this.isEmpty) return '';
+    return this.required ? '1px solid var(--p-red-500)' :
+      this.recommended ? '1px solid var(--p-yellow-500)' : '';
+  }
 
-    @Input()
-    public calculated: boolean = false;
+  onBlur(): void {
+    this.valueChange.emit(this.value);
+    this.blur.emit(this.value);
+  }
 }

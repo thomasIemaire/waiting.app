@@ -1,0 +1,153 @@
+<p-confirmDialog [draggable]="false"></p-confirmDialog>
+
+<div class="flow__container">
+
+    <div class="toolbar">
+        <div class="toolbar--left">
+            <p-button icon="fa-solid fa-angle-left" severity="secondary" size="small" rounded text
+                (click)="goBackNavigation()" />
+
+            <div>
+                @if (isEditingTitle) {
+                <input #titleInput class="title-input" type="text" [(ngModel)]="flow.title" (blur)="stopEditingTitle()"
+                    (keydown)="onTitleKeydown($event)" (mousedown)="$event.stopPropagation()" [pAutoFocus]="true" />
+                } @else {
+                <p-button iconPos="right" text rounded severity="secondary" [label]="flow.title"
+                    (click)="startEditingTitle($event)" icon="fa-solid fa-pen-to-square edit-icon" />
+                }
+            </div>
+        </div>
+
+        <div class="toolbar--actions">
+            <p-button label="Enregistrer" severity="contrast" size="small" rounded (click)="onSave()" />
+        </div>
+    </div>
+
+    <div class="ide">
+        <div class="ide__content">
+
+            <div #viewport class="viewport__container" (wheel)="onWheel($event)" (mousemove)="onMouseMove($event)"
+                (document:mousedown)="onDocMouseDown($event)" (document:mousemove)="onDocMouseMove($event)"
+                (document:mouseup)="onDocMouseUp($event)" (dragover)="onWorldDragOver($event)"
+                (drop)="onWorldDrop($event)" (mousedown)="onViewportMouseDown($event)" (click)="onViewportClick()">
+
+                <div class="canvas">
+                    <svg class="dot__background" preserveAspectRatio="none">
+                        <defs>
+                            <pattern id="dots" patternUnits="userSpaceOnUse" [attr.width]="baseStep"
+                                [attr.height]="baseStep"
+                                [attr.patternTransform]="'translate(' + ox + ',' + oy + ') scale(' + scale + ')'">
+                                <circle [attr.cx]="baseStep/2" [attr.cy]="baseStep/2" [attr.r]="dotR"
+                                    fill="var(--background-color-300)"></circle>
+                            </pattern>
+                        </defs>
+                        <rect x="0" y="0" width="100%" height="100%" fill="var(--background-color-200)"></rect>
+                    </svg>
+
+                    <div class="world" [style.transform]="'translate(' + ox + 'px,' + oy + 'px) scale(' + scale + ')'"
+                        [class.is-dragging]="worldDragging">
+
+                        <svg class="wires">
+                            <defs>
+                                <marker id="arrow" viewBox="0 0 12 12" markerWidth="6" markerHeight="6" refX="10"
+                                    refY="12" orient="auto">
+                                </marker>
+                            </defs>
+
+                            @for (l of links; track l.id) {
+                            <g class="wire-group" [class.is-focused]="focusedLink?.id === l.id"
+                                (click)="onLinkClick($event, l)">
+                                <path class="wire" [class.wire--dashed]="l.relation === 'entry-exit'" [attr.d]="l.d"
+                                    marker-end="url(#arrow)"></path>
+                                <path class="wire-hit" [attr.d]="l.d"></path>
+                            </g>
+                            }
+
+                            @if (pendingLink) {
+                            <path class="wire wire--preview"
+                                [class.wire--dashed]="pendingLink.from.kind === 'entry' || pendingLink.from.kind === 'exit'"
+                                [attr.d]="pendingPreviewD" marker-end="url(#arrow)">
+                            </path>
+                            }
+                        </svg>
+
+                        @for (n of nodes; track n.id) {
+                        <app-gflow-node class="node" [attr.data-node-id]="n.id" [links]="links" [style.left.px]="n.x"
+                            [style.top.px]="n.y" [style.zIndex]="n.focused ? 10 : 1" [class.is-selected]="n.selected"
+                            [class.is-focused]="n.focused" [class.is-dragging]="dragState.node?.id === n.id"
+                            [class.io-hidden]="ioHidden(n)" [class.exit-hidden]="exitHidden(n)" [item]="n"
+                            (mousedown)="startDrag($event, n)"
+                            (click)="focusNode(n); openConfig(); $event.stopPropagation()" (dblclick)="centerNode(n)">
+                        </app-gflow-node>
+                        }
+                    </div>
+                </div>
+
+                @if (selectionState.active) {
+                <div class="selection-rect" [ngStyle]="selectionState.style"></div>
+                }
+            </div>
+        </div>
+
+        <div class="floating-actions-toolbar">
+            <button class="action-btn" [class.active]="currentTool === 'pan'" (click)="setTool('pan')"
+                title="Outil Main (Panoramique)">
+                <i class="fa-solid fa-hand"></i>
+            </button>
+
+            <button class="action-btn" [class.active]="currentTool === 'select'" (click)="setTool('select')"
+                title="Outil Sélection (Curseur)">
+                <i class="fa-solid fa-arrow-pointer"></i>
+            </button>
+
+            <div class="separator"></div>
+
+            <button class="action-btn" (click)="undo()" [disabled]="!canUndo" title="Annuler">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+
+            <button class="action-btn" (click)="redo()" [disabled]="!canRedo" title="Rétablir">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+        </div>
+
+        @if (configOpen) {
+        <aside class="config-sidebar" (mousedown)="$event.stopPropagation()">
+
+            <div class="config-sidebar__content">
+                <app-gflow-config-panel [node]="focusedNode" [link]="focusedLink" [nodes]="nodes" [links]="links"
+                    [inputMap]="focusedInputMap" (configChange)="onNodeConfigChange($event)" (cancel)="closeConfig()"
+                    (save)="closeConfig()" (delete)="onDeleteFromPanel()">
+                </app-gflow-config-panel>
+            </div>
+
+        </aside>
+        }
+
+        @if (paletteOpen) {
+        <aside class="palette-floating" (mousedown)="$event.stopPropagation()">
+            <div class="palette__content">
+                <div class="palette__groups">
+                    @for (g of paletteGroups; track g.name) {
+                    <section class="palette__group">
+                        <span class="palette__title">{{ g.name }}</span>
+                        <div class="palette__items">
+                            @for (it of g.items; track it.label) {
+                            <button class="palette__item" draggable="true" (dragstart)="onPaletteDragStart($event, it)"
+                                (click)="addFromPalette(it)">
+                                <div class="palette__item-icon"
+                                    [style.backgroundColor]="it.color || 'var(--background-color-surface)'">
+                                    <i [class]="it.icon?.icon" [style.rotate.deg]="it.icon?.rotate"></i>
+                                </div>
+                                <span class="palette__item-label">{{ it.label }}</span>
+                            </button>
+                            }
+                        </div>
+                    </section>
+                    }
+                </div>
+            </div>
+        </aside>
+        }
+    </div>
+</div>

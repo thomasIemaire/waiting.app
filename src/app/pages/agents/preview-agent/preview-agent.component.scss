@@ -1,0 +1,81 @@
+.preview-agent__container {
+    width: 100%;
+    height: 100%;
+    padding: var(--padding-l);
+    border-radius: var(--radius-l);
+    background-color: var(--background-color-100);
+    min-height: 0;
+    overflow: hidden;
+
+    .preview-agent__wrapper {
+        min-height: 0;
+        overflow: hidden;
+
+        width: 100%;
+        height: 100%;
+        border-radius: var(--radius-m);
+        background-color: var(--background-color-50);
+        border: 1px solid var(--background-color-300);
+        padding: var(--padding-l);
+
+        .preview-agent__model-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap-l);
+
+            .model-wrapper__header {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .model-wrapper__header-leftside {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    gap: var(--gap-m);
+
+                    .model-wrapper__header-name {
+                        font-size: 1.125rem;
+                        font-weight: 600;
+                    }
+                }
+            }
+
+            .model-wrapper__content {
+                flex: 1 1 auto;
+                min-height: 0;
+                overflow: auto;
+                display: flex;
+                flex-direction: column;
+                gap: var(--gap-l);
+
+                .form__wrapper {
+                    &--configuration {
+                        display: flex;
+                        flex-direction: column;
+                        gap: var(--gap-l);
+
+                        .configuration-form__header {
+                            display: flex;
+                            align-items: center;
+                            gap: var(--gap-l);
+                            font-weight: 500;
+                            color: var(--p-text-muted-color);
+                            font-size: var(--p-button-sm-font-size);
+
+                            .configuration-form__header-name {
+                                min-height: 25px;
+                                color: var(--p-text-color);
+                                font-size: 1.125rem;
+                                font-weight: 600;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

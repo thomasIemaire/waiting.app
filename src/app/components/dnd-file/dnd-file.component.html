@@ -1,10 +1,8 @@
 <div class="dnd-file__container" role="button" tabindex="0" (click)="openFileDialog()" (keydown)="onKeydown($event)">
     <input #fileInput type="file" [attr.accept]="acceptAttr" [attr.multiple]="multiple ? '' : null"
         (change)="onFileSelect($event)" hidden />
-
     <div class="dnd-file__wrapper" [class.dragover]="isDragOver" (dragover)="onDragOver($event)"
         (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
-
         @if (!isUploading) {
         <i class="dnd-file__icon pi pi-cloud-upload"></i>
         <div class="dnd-file__text">
@@ -21,6 +19,5 @@
             <p-progressbar mode="indeterminate" [style]="{ height: '6px' }" />
         </div>
         }
-
     </div>
 </div>

@@ -1,0 +1,28 @@
+<div class="formats-form__wrapper">
+    <div class="form__wrapper">
+        <div class="form__inputs-group">
+
+            <input *ngIf="edit" pInputText [(ngModel)]="internalFormat" (blur)="validateEdit()"
+                (keydown.enter)="validateEdit()" [pAutoFocus]="true" type="text" placeholder="Format (ex: {nom}_{date})"
+                pSize="small" fluid />
+
+            <div class="format-token" *ngIf="!edit" (click)="edit = true">
+                <ng-container *ngIf="internalFormat; else emptyFormat">
+                    <ng-container *ngFor="let t of tokens">
+                        <span *ngIf="t.key; else plain" class="entity-in-example" [pTooltip]="t.key"
+                            tooltipPosition="top">
+                            {{ t.text }}
+                        </span>
+                        <ng-template #plain>{{ t.text }}</ng-template>
+                    </ng-container>
+                </ng-container>
+                <ng-template #emptyFormat>
+                    <span style="opacity: 0.5; font-style: italic;">Cliquer pour éditer le format...</span>
+                </ng-template>
+            </div>
+
+            <p-button icon="pi pi-minus" variant="text" severity="danger" size="small" pTooltip="Supprimer le format"
+                tooltipPosition="left" (click)="remove.emit()"></p-button>
+        </div>
+    </div>
+</div>

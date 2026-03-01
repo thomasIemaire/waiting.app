@@ -3,6 +3,8 @@ import { ProgressBar } from 'primeng/progressbar';
 import { Utils } from '../../core/utils/utils';
 import { TruncateTextPipe } from '../../core/pipes/truncate-text.pipe';
 import { MessageService } from 'primeng/api';
+import { DocumentsService } from '../../core/services/documents.service';
+import { DeviceService } from '../../core/services/device.service';
 
 export interface Base64File {
     name: string;
@@ -38,6 +40,8 @@ export class DndFileComponent {
     @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
     private messageService: MessageService = inject(MessageService);
+    private documentsService: DocumentsService = inject(DocumentsService);
+    private deviceService: DeviceService = inject(DeviceService);
 
     isDragOver = false;
 
@@ -45,9 +49,13 @@ export class DndFileComponent {
     fileUploading: Base64File | null = null;
 
     get labelPlural(): string {
+        let labelUnique = `Glisser-déposer votre ${this.label} ici ou cliquer pour l'importer`;
+        if (this.deviceService.isMobile)
+            labelUnique = `Appuyez pour importer votre ${this.label} ou prendre une photo`;
+
         return this.multiple
             ? `Glisser-déposer mes ${this.label}s ici ou cliquer pour les importer`
-            : `Glisser-déposer votre ${this.label} ici ou cliquer pour l'importer`;
+            : labelUnique;
     }
 
     get acceptAttr(): string {
@@ -120,9 +128,19 @@ export class DndFileComponent {
         try {
             for (const file of files) {
                 this.fileUploading = file;
-                ids.push(String(new Date().getTime()));
+                await this.documentsService.uploadDocument(file).then((data) => {
+                    ids.push(data._id);
+                });
                 await Utils.delay(2000);
             }
+        } catch (err: any) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erreur lors de l\'envoi',
+                detail: err?.message || 'Une erreur est survenue lors de l\'envoi du fichier.',
+                life: 5000
+            });
+            return ids;
         } finally {
             this.fileUploading = null;
             this.isUploading = false;
@@ -133,12 +151,20 @@ export class DndFileComponent {
     private fileToBase64(file: File): Promise<Base64File> {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onerror = () => reject(reader.error);
+            reader.onerror = () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: `Erreur de lecture`,
+                    detail: file.name,
+                    life: 3000
+                });
+                reject(reader.error)
+            };
             reader.onload = () => {
                 const dataUrl = String(reader.result);
                 const base64 = dataUrl.split(',')[1] ?? '';
                 resolve({
-                    name: file.name,
+                    name: file.name || this.newFilename(file.type),
                     type: file.type,
                     size: file.size,
                     lastModified: file.lastModified,
@@ -148,6 +174,11 @@ export class DndFileComponent {
             };
             reader.readAsDataURL(file);
         });
+    }
+
+    private newFilename(type: string): string {
+        const ext = type.split('/').pop() ?? 'dat';
+        return `file_${new Date().getTime()}.${ext}`;
     }
 
     private splitAccepted(files: File[]): { accepted: File[]; refused: File[] } {
